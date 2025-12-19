@@ -47,7 +47,8 @@
 
 ## ⛓️ Uncensored Access 🃏
 If the conventional DNS grid (Cloudflare/GitHub) becomes inaccessible - the core assets are anchored on-chain.
+
 This identity serves as the cryptographic root of trust for project integrity and IPFS retrieval:
 
-**ENS:** `jape.eth`
-**CA:** `0x10761b751Df984C505c98E425CdEA066B69CA741`
+* **ENS:** `jape.eth`
+* **CA:** `0x10761b751Df984C505c98E425CdEA066B69CA741`
