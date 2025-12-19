@@ -1,5 +1,11 @@
 # 🏰 ci5.network: The Living Citadel 🔬
-###### 📡 [ci5.host](https://github.com/dreamswag/ci5): core ~ 📟 [ci5.run](https://github.com/dreamswag/ci5.run): auto ~ 🔬 [ci5.network](https://github.com/dreamswag/ci5.network): docs
+###### 📟 [ci5.run](https://ci5.run): curl ~ 📡 [ci5.host](https://github.com/dreamswag/ci5): core ~ 🔬 [ci5.network](https://github.com/dreamswag/ci5.network/): cert
+## 📚 Field Manuals
+* **[Hardware Guide (HG)](docs/HG.md)** - Recommended hardware and setup.
+* **[Advanced Security](docs/advanced_security.md)** - Hardening your instance.
+* **[Maintenance](docs/MAINTENANCE.md)** - Updates and upkeep.
+* **[Support](docs/SUPPORT.md)** - How to get help.
+
 ## 🏴‍☠️ Project Paradigm
 **Ci5** is a net-correctional facility for the Raspberry Pi 5.
 
@@ -17,12 +23,6 @@
     * Establishing 0ms latency under full load as a new norm.
 * **Guarantee verifiably that you always have a "clean room" within your digital life:**
     * Rather than optimistically expecting to be left alone by others.
-
-## 📚 Field Manuals
-* [Hardware Guide (HG)](docs/HG.md) - Recommended hardware and setup.
-* [Advanced Security](docs/advanced_security.md) - Hardening your instance.
-* [Maintenance](docs/MAINTENANCE.md) - Updates and upkeep.
-* [Support](docs/SUPPORT.md) - How to get help.
 
 ## 📡 Community Protocols
 *Access the [Discussions Frequency](https://github.com/dreamswag/ci5.network/discussions) to interact with the fleet.*
