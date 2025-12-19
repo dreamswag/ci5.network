@@ -1,5 +1,5 @@
-# 🏰 ci5.network: The Living Citadel 🔬
-###### 📟 [ci5.run](https://ci5.run): curl ~ 📡 [ci5.host](https://github.com/dreamswag/ci5): core ~ 🔬 [ci5.network](https://github.com/dreamswag/ci5.network/): cert
+# 🏰 **[ci5.network](https://ci5.network/):~#** cert 🔬
+###### 📟 [ci5.run](https://github.com/dreamswag/ci5.run): curl ~ 📡 [ci5.host](https://github.com/dreamswag/ci5): core ~ 🔬 [ci5.network](https://github.com/dreamswag/ci5.network/): cert
 ## 📚 Field Manuals
 * **[Hardware Guide (HG)](docs/HG.md)** - Recommended hardware and setup.
 * **[Advanced Security](docs/advanced_security.md)** - Hardening your instance.
