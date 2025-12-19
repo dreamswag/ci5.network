@@ -1,7 +1,5 @@
 # 🏰 ci5.network: The Living Citadel 🔬
-
 ###### 📡 [ci5.host](https://github.com/dreamswag/ci5): core ~ 📟 [ci5.run](https://github.com/dreamswag/ci5.run): auto ~ 🔬 [ci5.network](https://github.com/dreamswag/ci5.network): docs
-
 ## 🏴‍☠️ Project Paradigm
 **Ci5** is a net-correctional facility for the Raspberry Pi 5.
 
