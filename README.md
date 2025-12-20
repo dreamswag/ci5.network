@@ -1,4 +1,4 @@
-# 🏰 **[ci5.network](https://ci5.network/):~#** cert 🔬
+# 🏰 **[ci5.network](https://ci5.network/):~#** certification 🔬
 ###### 📟 [ci5.run](https://github.com/dreamswag/ci5.run): curl ~ 📡 [ci5.host](https://github.com/dreamswag/ci5): core ~ 🔬 [ci5.network](https://github.com/dreamswag/ci5.network/): cert
 ## 📚 Field Manuals
 * **[Hardware Guide (HG)](docs/HG.md)** - Recommended hardware and setup.
