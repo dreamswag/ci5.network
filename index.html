@@ -2,131 +2,154 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ci5.network [CERT]</title>
-    <link rel="stylesheet" href="https://ci5.run/static/style.css">
-    <style>
-        /* Shared TUI Layout */
-        body { overflow-y: auto; height: auto; display: block; padding-top: 50px; }
-        .tui-container { 
-            max-width: 1000px; margin: 0 auto; padding-bottom: 60px;
-            background: rgba(10, 10, 10, 0.95); 
-            border: 1px solid #222; border-radius: 6px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
-        }
-        .tui-header { 
-            padding: 15px 20px; border-bottom: 1px solid #222; 
-            background: linear-gradient(to bottom, #1a1a1a 0%, #050505 100%);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .tui-body { padding: 30px; color: #d3d7cf; font-family: 'Piboto', monospace; }
-        
-        .grid-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 40px 0; }
-        .menu-item { 
-            border: 1px solid #333; padding: 20px; text-align: center; 
-            transition: all 0.2s; cursor: pointer; background: #080808;
-        }
-        .menu-item:hover { border-color: #00e5ff; transform: translateY(-2px); }
-        .menu-icon { font-size: 2em; margin-bottom: 10px; display: block; }
-        .menu-title { font-weight: bold; color: #fff; }
-        .menu-desc { font-size: 0.8em; color: #666; margin-top: 5px; }
-
-        .scoreboard { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; }
-        .scoreboard th { text-align: left; border-bottom: 1px solid #444; color: #75507b; padding: 10px; }
-        .scoreboard td { padding: 10px; border-bottom: 1px solid #111; color: #aaa; }
-        .rank-1 { color: #fce94f !important; font-weight: bold; }
-        
-        .nav-bar { text-align: center; margin-bottom: 20px; font-size: 0.9em; color: #555; }
-        .nav-bar a { color: #00e5ff; text-decoration: none; margin: 0 5px; }
-        .nav-bar a:hover { color: #fff; }
-    </style>
+    <title>Ci5buntu [NET]</title>
+    <link rel="stylesheet" href="static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://ci5.run/static/signal.png">
 </head>
 <body>
 
-    <div class="nav-bar">
-        📟 <a href="https://ci5.run">ci5.run</a>: curl ~ 
-        📡 <a href="https://github.com/dreamswag/ci5">ci5.host</a>: core ~ 
-        🧪 <a href="https://ci5.dev">ci5.dev</a>: cork ~ 
-        🔬 <a href="https://ci5.network">ci5.network</a>: cert
-    </div>
-
-    <div class="tui-container">
-        <div class="tui-header">
-            <span class="white">root@ci5.network:~/cert#</span>
-            <span class="green">BUFFERBLOAT: A+</span>
+    <div class="top-bar">
+        <div class="top-left">
+            <span class="activity">Activities</span>
+            <span class="app-name" id="activeApp">Desktop</span>
         </div>
-        <div class="tui-body">
-            
-            <div style="text-align:center;">
-                <h1 style="margin:0; color:#fff; font-size:2.5em; letter-spacing:2px;">ci5.network</h1>
-                <div class="cyan" style="font-size:1.2em;">CERTIFICATION & PROOF</div>
-                <div class="dim" style="margin-top:10px;">
-                    Validating the 5-Dimensional Architecture.<br>
-                    <i>Trust, but verify.</i>
-                </div>
-            </div>
-
-            <div class="grid-menu">
-                <div class="menu-item" onclick="window.location='https://github.com/dreamswag/ci5.network/blob/main/docs/HG.md'">
-                    <span class="menu-icon">📚</span>
-                    <div class="menu-title">Hardware Guide</div>
-                    <div class="menu-desc">The Golden Stack</div>
-                </div>
-                <div class="menu-item" onclick="window.location='https://github.com/dreamswag/ci5.network/blob/main/docs/advanced_security.md'">
-                    <span class="menu-icon">🔐</span>
-                    <div class="menu-title">Security</div>
-                    <div class="menu-desc">Hardening & Keys</div>
-                </div>
-                <div class="menu-item" onclick="window.location='https://github.com/dreamswag/ci5.network/blob/main/docs/MAINTENANCE.md'">
-                    <span class="menu-icon">🛠️</span>
-                    <div class="menu-title">Maintenance</div>
-                    <div class="menu-desc">Upkeep Protocols</div>
-                </div>
-                <div class="menu-item" onclick="window.location='https://github.com/dreamswag/ci5.network/blob/main/docs/SUPPORT.md'">
-                    <span class="menu-icon">🆘</span>
-                    <div class="menu-title">Support</div>
-                    <div class="menu-desc">Self-Help Protocol</div>
-                </div>
-            </div>
-
-            <div class="section-header" style="color: #fce94f; border-bottom: 1px dashed #333; margin-bottom: 15px;">
-                🏆 St. Guinea CiG: The 1.74Gbps Gauntlet
-            </div>
-            
-            <table class="scoreboard">
-                <thead>
-                    <tr>
-                        <th>RANK</th>
-                        <th>PILOT</th>
-                        <th>THROUGHPUT</th>
-                        <th>LATENCY</th>
-                        <th>HARDWARE</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="rank-1">0</td>
-                        <td>[UNCLAIMED]</td>
-                        <td>---</td>
-                        <td>---</td>
-                        <td>Pi 5 (8GB)</td>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>dreamswag</td>
-                        <td>500/500 Mbps</td>
-                        <td>+0ms</td>
-                        <td>Reference</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="dim" style="margin-top:50px; text-align:center; font-size:0.8em; border-top:1px solid #222; padding-top:20px;">
-                IDENTITY: 0x1076...741 <span class="cyan">//</span> JAPE.ETH
-            </div>
+        <div class="top-center">
+            <span class="clock">Sat 20 Dec 14:02</span>
+        </div>
+        <div class="top-right">
+            <span class="status-icon">▼</span>
+            <span class="status-icon">🔋</span>
+            <span class="status-icon">🔈</span>
         </div>
     </div>
 
+    <div class="dock">
+        <div class="dock-item" onclick="openWindow('community')" title="Ci5 Community">
+            <div class="icon-box discord">#</div>
+            <div class="dot hidden" id="dot-comm"></div>
+        </div>
+        <div class="dock-item" onclick="openWindow('files')" title="File System">
+            <div class="icon-box folder">/</div>
+            <div class="dot hidden" id="dot-files"></div>
+        </div>
+        <div class="dock-item" onclick="window.location='https://ci5.run'" title="Terminal Uplink">
+            <div class="icon-box term">>_</div>
+        </div>
+        <div class="dock-spacer"></div>
+        <div class="dock-item" title="Trash">
+            <div class="icon-box trash">🗑</div>
+        </div>
+    </div>
+
+    <div class="desktop-grid">
+        <div class="desktop-icon" onclick="openWindow('files')">
+            <div class="d-icon">📁</div>
+            <div class="d-label">Ci5_Docs</div>
+        </div>
+        <div class="desktop-icon" onclick="openWindow('community')">
+            <div class="d-icon">💬</div>
+            <div class="d-label">Community</div>
+        </div>
+        <div class="desktop-icon" onclick="window.open('https://github.com/dreamswag/ci5', '_blank')">
+            <div class="d-icon">🐙</div>
+            <div class="d-label">Source_Code</div>
+        </div>
+    </div>
+
+    <div class="os-window hidden" id="win-community" style="width: 900px; height: 600px; top: 50%; left: 55%;">
+        <div class="window-header" id="drag-comm">
+            <div class="win-controls">
+                <div class="win-btn close" onclick="closeWindow('community')"></div>
+                <div class="win-btn min"></div>
+                <div class="win-btn max"></div>
+            </div>
+            <div class="win-title">Ci5 Community Relay</div>
+        </div>
+        <div class="window-body discord-layout">
+            <div class="discord-sidebar">
+                <div class="channel-group">CHANNELS</div>
+                <div class="channel active" onclick="switchChannel('general')"># general</div>
+                <div class="channel" onclick="switchChannel('builds')"># monster-builds</div>
+                <div class="channel" onclick="switchChannel('help')"># queries-help</div>
+                <div class="channel-group">METADATA</div>
+                <div class="channel" onclick="window.open('https://github.com/dreamswag/ci5/discussions')">↗ open_github</div>
+            </div>
+            <div class="discord-chat">
+                <div class="chat-header">
+                    <span class="hash">#</span> <span id="chat-title">general</span>
+                    <span class="topic"> // The Sovereign Lounge</span>
+                </div>
+                <div class="chat-feed" id="chat-feed">
+                    </div>
+                <div class="chat-input-area">
+                    <div class="chat-input-fake">You are viewing in Read-Only Mode. Authenticate via GitHub to post.</div>
+                </div>
+            </div>
+            <div class="discord-users">
+                <div class="role-header">CREATOR</div>
+                <div class="user owner">dreamswag</div>
+                <div class="role-header">SOVEREIGNS — 12,847</div>
+                <div class="user">anon_192</div>
+                <div class="user">net_runner</div>
+                <div class="user">pi_guy_5</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="os-window hidden" id="win-files" style="width: 700px; height: 500px; top: 45%; left: 45%;">
+        <div class="window-header" id="drag-files">
+            <div class="win-controls">
+                <div class="win-btn close" onclick="closeWindow('files')"></div>
+                <div class="win-btn min"></div>
+                <div class="win-btn max"></div>
+            </div>
+            <div class="win-title">/home/root/docs</div>
+        </div>
+        <div class="window-body file-layout">
+            <div class="file-path-bar">
+                <div class="path-btn">&lt;</div>
+                <div class="path-btn">&gt;</div>
+                <div class="path-text">/var/www/ci5/docs/</div>
+            </div>
+            <div class="file-grid">
+                <div class="file-item" onclick="openFile('HG.md')">
+                    <div class="f-icon">📄</div>
+                    <div class="f-name">Hardware_Guide.md</div>
+                </div>
+                <div class="file-item" onclick="openFile('SEC.md')">
+                    <div class="f-icon">🔐</div>
+                    <div class="f-name">Security.md</div>
+                </div>
+                <div class="file-item" onclick="openFile('MNT.md')">
+                    <div class="f-icon">🛠</div>
+                    <div class="f-name">Maintenance.md</div>
+                </div>
+                <div class="file-item" onclick="openFile('SUP.md')">
+                    <div class="f-icon">❓</div>
+                    <div class="f-name">Support_FAQ.md</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="os-window hidden" id="win-viewer" style="width: 600px; height: 700px; top: 40%; left: 60%; z-index: 100;">
+        <div class="window-header" id="drag-viewer">
+            <div class="win-controls">
+                <div class="win-btn close" onclick="closeWindow('viewer')"></div>
+                <div class="win-btn min"></div>
+                <div class="win-btn max"></div>
+            </div>
+            <div class="win-title" id="viewer-title">nano reader</div>
+        </div>
+        <div class="window-body terminal-body">
+            <div id="file-content" class="term-text"></div>
+            <div class="term-status-bar">
+                [ Read 142 lines ] ^X Exit
+            </div>
+        </div>
+    </div>
+
+    <script src="static/script.js"></script>
 </body>
 </html>
