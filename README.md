@@ -44,7 +44,7 @@
 ---
 
 ## ⛓️ Uncensored Access 🃏
-If the conventional DNS grid (Cloudflare/GitHub) becomes inaccessible - the core assets are anchored on-chain.
+If the conventional DNS grid (Cloudflare/GitHub) becomes inaccessible - the core assets are (🔜) anchored on-chain.
 
 This identity serves as the cryptographic root of trust for project integrity and IPFS retrieval:
 
