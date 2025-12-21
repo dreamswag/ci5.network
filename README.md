@@ -1,14 +1,14 @@
 ###### 📟 [ci5.run](https://github.com/dreamswag/ci5.run): curl ~ 🔬 [ci5.host](https://github.com/dreamswag/ci5.host): cure ~ 🧪 [ci5.dev](https://github.com/dreamswag/ci5.dev): cork ~ 🥼 [ci5.network](https://github.com/dreamswag/ci5.network): cert ~ 📡[ci5](https://github.com/dreamswag/ci5)🛰️
 # 🏰 **[ci5.network](https://ci5.network/):** Encertification.🥼
-### 📚 Field Manuals
+#### **Ci5** is a Net-Correctional Facility for the Raspberry Pi 5.
+
+## 📚 Field Manuals
 * **[Hardware Guide (HG)](docs/HG.md)** - Recommended hardware and setup.
 * **[Advanced Security](docs/advanced_security.md)** - Hardening your instance.
 * **[Maintenance](docs/MAINTENANCE.md)** - Updates and upkeep.
 * **[Support](docs/SUPPORT.md)** - How to get help.
 
 ## 🏴‍☠️ Project Paradigm
-**Ci5** is a net-correctional facility for the Raspberry Pi 5.
-
 ### The Aim:
 * **Physically punish bufferbloat.**
 * Excise network telemetry at the kernel level.
