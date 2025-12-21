@@ -41,8 +41,6 @@
 **Status:** *Performance Proof*
 * Upload your RRUL results. Post your `flent.gz` or screenshots to the infinite scoreboard.
 
----
-
 ## ⛓️ Uncensored Access 🃏
 If the conventional DNS grid (Cloudflare/GitHub) becomes inaccessible - the core assets are (🔜) anchored on-chain.
 
