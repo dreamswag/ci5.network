@@ -1,50 +1,117 @@
 ###### 📟 [ci5.run](https://github.com/dreamswag/ci5.run): curl ~ 🔬 [ci5.host](https://github.com/dreamswag/ci5.host): cure ~ 🧪 [ci5.dev](https://github.com/dreamswag/ci5.dev): cork ~ 🥼 [ci5.network](https://github.com/dreamswag/ci5.network): cert ~ 📡[ci5](https://github.com/dreamswag/ci5)🛰️
 # 🏰 **[ci5.network](https://ci5.network/):** Encertification.🥼
-#### **Ci5** is a Net-Correctional Facility for the Raspberry Pi 5.
 
-## 📚 Field Manuals
-* **[Hardware Guide (HG)](docs/HG.md)** - Recommended hardware and setup.
-* **[Advanced Security](docs/advanced_security.md)** - Hardening your instance.
-* **[Maintenance](docs/MAINTENANCE.md)** - Updates and upkeep.
-* **[Support](docs/SUPPORT.md)** - How to get help.
+**Ci5 is a Net-Correctional Facility for the Raspberry Pi 5:**
 
-## 🏴‍☠️ Project Paradigm
-### The Aim:
-* **Physically punish bufferbloat.**
-* Excise network telemetry at the kernel level.
+Transform a £70 board into a **sovereign routing engine** with:
+- **0ms bufferbloat** under load
+- **Enterprise-grade IDS/IPS**
+- **Network-wide ad-blocking**
+- **VLAN segmentation**
+- *and much more...*
 
-### The Reason:
-* ISPs sell "Speed" (Throughput) but deliver "Lag" (Latency).
-* Consumer routers are bloated surveillance nodes that prioritize marketing data over packet discipline.
+---
 
-### The Purpose:
-* **Transform a £70 computer into a serious sovereign routing engine:**
-    * Enforcing consistent enterprise-grade security fortification.
-    * Establishing 0ms latency under full load as a new norm.
-* **Guarantee verifiably that you always have a "clean room" within your digital life:**
-    * Rather than optimistically expecting to be left alone by others.
+## 📚 Documentation Index
+
+| Document | Purpose |
+|----------|---------|
+| **[QUICKSTART.md](docs/QUICKSTART.md)** | 5-minute setup guide |
+| **[GOLDEN_HARDWARE.md](docs/GOLDEN_HARDWARE.md)** | Required hardware + compatibility |
+| **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** | Technical deep-dive |
+| **[CORKS.md](docs/CORKS.md)** | Container registry + auditing |
+| **[MAINTENANCE.md](docs/MAINTENANCE.md)** | Updates, recovery, diagnostics |
+| **[SUPPORT.md](docs/SUPPORT.md)** | Self-service troubleshooting |
+| **[OFFLINE_INSTALL.md](docs/OFFLINE_INSTALL.md)** | Manual/paranoid installation |
+| **[HG.md](docs/HG.md)** | The "Holy CiG" Gauntlet Challenge |
+
+---
 
 ## 📡 Community Protocols
-*Access the [Discussions Frequency](https://github.com/dreamswag/ci5.network/discussions) to interact with the fleet.*
 
 ### 🚨 [INTEL_REQ](https://github.com/dreamswag/ci5.network/discussions/categories/intel_req)
-**Status:** *Unsolved Queries*
-* Post here if your node is malfunctioning.
-* **Upvote** helpful intel.
-* **Mark as Answered** when functionality is restored.
+**Unsolved Queries** - Post malfunctions here. Include `bone_marrow.sh` output.
 
 ### 🛠️ [ARMORY](https://github.com/dreamswag/ci5.network/discussions/categories/armory)
-**Status:** *Hardware Showcase*
-* Showcase your Sovereign Stack. Passive cooling mods, custom enclosures, 2.5G implementations.
+**Hardware Showcase**: 
+
+- Custom Enclosures
+- Cooling Mods
+- HAT Implementations
+  - (*2.5G NIC / nVME etc.*)
 
 ### 📊 [METRICS](https://github.com/dreamswag/ci5.network/discussions/categories/metrics)
-**Status:** *Performance Proof*
-* Upload your RRUL results. Post your `flent.gz` or screenshots to the infinite scoreboard.
+**Performance Proof**: 
 
-## ⛓️ Uncensored Access 🃏
-If the conventional DNS grid (Cloudflare/GitHub) becomes inaccessible - the core assets are (🔜) anchored on-chain.
+- Upload your RRUL results. 
+- Auto-added to [ci5.network](https://ci5.network)'s infinite scoreboard:
+  - **Recent Submissions**
+  - '**Holy CiG5** 🤯' (Top 5)
+  - **Community-Aggregated Data Visualisation**
 
-This identity serves as the cryptographic root of trust for project integrity and IPFS retrieval:
+---
 
-* **ENS:** `jape.eth`
-* **CA:** `0x10761b751Df984C505c98E425CdEA066B69CA741`
+## ⛓️ Uncensored Access
+
+If conventional DNS becomes inaccessible, core assets are anchored on-chain:
+
+| Identity | Value |
+|----------|-------|
+| **ENS** | `jape.eth` |
+| **CA** | `0x10761b751Df984C505c98E425CdEA066B69CA741` |
+
+---
+
+## 🗂️ Repository Structure
+
+```
+ci5.network/
+├── index.html           # Confirmed Compromised Corks (& Hardware-ID Blacklisted) TBA
+├── docs/
+│   ├── QUICKSTART.md
+│   ├── GOLDEN_HARDWARE.md
+│   ├── ARCHITECTURE.md
+│   ├── CORKS.md
+│   ├── MAINTENANCE.md
+│   ├── SUPPORT.md
+│   ├── OFFLINE_INSTALL.md
+│   ├── HG.md
+│   └── archive/
+│       ├── advanced_security.md
+│       └── performance_proof.md
+└── static/
+    ├── script.js
+    └── style.css
+```
+
+---
+
+## 🔗 Ecosystem Map
+
+```
+         ┌─────────────────────────────────────┐
+         │            USER                      │
+         │              │                       │
+         │        curl ci5.run/free             │
+         │              │                       │
+         │              ▼                       │
+         │  ┌───────────────────────┐          │
+         │  │      ci5.run          │          │
+         │  │    (Bootloader)       │          │
+         │  └───────────┬───────────┘          │
+         │              │                       │
+         │    ┌─────────┼─────────┐            │
+         │    ▼         ▼         ▼            │
+         │ ┌─────┐  ┌───────┐  ┌───────┐       │
+         │ │ ci5 │  │ci5.host│  │ci5.dev│      │
+         │ │Core │  │ Audit │  │Registry│      │
+         │ └─────┘  └───────┘  └───────┘       │
+         │    │         │         │            │
+         │    └─────────┼─────────┘            │
+         │              ▼                       │
+         │  ┌───────────────────────┐          │
+         │  │    ci5.network        │◀── YOU   │
+         │  │  (Documentation)      │   ARE    │
+         │  └───────────────────────┘   HERE   │
+         └─────────────────────────────────────┘
+```

@@ -1,159 +1,152 @@
-/* CI5BUNTU FRANKENSTEIN THEME */
+/* CI5 vBULLETIN THEME */
 :root {
-    --bg-color: #0d0d0d;
-    --dock-bg: #1a1a1a;
-    --win-bg: rgba(20, 20, 20, 0.95);
-    --term-green: #8ae234;
-    --owrt-purple: #75507b;
-    --owrt-cyan: #00e5ff;
-    --ubuntu-orange: #e95420; /* The Ubuntu nod */
-    --text-main: #d3d7cf;
-    --font-ui: 'Roboto', sans-serif;
-    --font-term: 'VT323', monospace;
+    --bg-page: #0F0F0F;
+    --bg-table: #1A1A1A;
+    --bg-row-a: #222222;
+    --bg-row-b: #1c1c1c;
+    --header-grad: linear-gradient(to bottom, #2d2d2d 0%, #1a1a1a 100%);
+    --header-text: #fff;
+    --text-main: #ccc;
+    --text-dim: #888;
+    --border: #000;
+    --highlight: #00e5ff; /* Ci5 Cyan */
+    --link: #8ae234; /* Ci5 Green */
+    --accent: #5c7099; /* Classic Forum Blue-ish tint */
 }
 
 body {
-    margin: 0; height: 100vh; overflow: hidden;
-    background: url('/static/signal.png') center/cover;
-    font-family: var(--font-ui); color: var(--text-main);
-    user-select: none;
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    font-family: 'Verdana', sans-serif;
+    font-size: 11px; /* The authentic vBulletin size */
+    margin: 0; padding: 0;
+    background-image: url('https://ci5.run/static/signal.png');
+    background-attachment: fixed;
+    background-size: cover;
 }
 
-/* TOP BAR */
-.top-bar {
-    height: 28px; background: #111; border-bottom: 1px solid #333;
+a { color: var(--text-main); text-decoration: none; }
+a:hover { text-decoration: underline; color: var(--highlight); }
+
+/* LAYOUT */
+.vb-header {
+    background: #000; padding: 15px 20px;
     display: flex; justify-content: space-between; align-items: center;
-    padding: 0 15px; font-size: 13px; z-index: 1000; position: relative;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    border-bottom: 4px solid var(--highlight);
 }
-.top-left, .top-right { display: flex; gap: 15px; font-weight: bold; }
-.activity { cursor: pointer; }
-.activity:hover { color: var(--term-green); }
-.clock { font-family: var(--font-term); font-size: 16px; color: #aaa; }
+.logo-area { display: flex; align-items: center; gap: 15px; }
+.vb-logo { height: 40px; }
+.logo-text .brand { font-size: 20px; font-weight: bold; color: #fff; letter-spacing: -1px; }
+.logo-text .slogan { color: #888; font-size: 10px; text-transform: uppercase; }
 
-/* LEFT DOCK */
-.dock {
-    position: fixed; left: 0; top: 28px; bottom: 0; width: 60px;
-    background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-    border-right: 1px solid #333; display: flex; flex-direction: column;
-    align-items: center; padding-top: 10px; z-index: 900;
+.banner-box {
+    background: #111; border: 1px solid #333; padding: 8px; font-family: monospace; font-size: 10px; color: #aaa;
 }
-.dock-item {
-    width: 40px; height: 40px; margin-bottom: 10px; position: relative;
-    cursor: pointer; transition: 0.2s;
+.green { color: var(--link); }
+.cyan { color: var(--highlight); }
+
+/* NAVBAR */
+.vb-navbar {
+    background: #333; border-bottom: 1px solid #000; padding: 6px 10px;
 }
-.dock-item:hover { transform: scale(1.1); }
-.icon-box {
-    width: 100%; height: 100%; border-radius: 10px; display: flex;
-    align-items: center; justify-content: center; font-size: 20px; font-weight: bold;
-    background: #333; color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+.nav-links a {
+    color: #fff; font-weight: bold; margin-right: 15px; font-size: 10px;
 }
-.discord { background: #5865F2; }
-.folder { background: #E95420; }
-.term { background: #000; border: 1px solid var(--term-green); color: var(--term-green); }
-.trash { background: #555; }
-.dock-spacer { flex: 1; }
-.dot {
-    position: absolute; left: -4px; top: 14px; width: 4px; height: 12px;
-    background: var(--ubuntu-orange); border-radius: 0 2px 2px 0;
+
+/* BODY CONTAINER */
+.vb-body {
+    max-width: 95%; margin: 20px auto;
+    background: rgba(10, 10, 10, 0.95);
+    border: 1px solid #333; padding: 10px;
 }
+
+.breadcrumb {
+    font-size: 10px; font-weight: bold; margin-bottom: 10px;
+    border-bottom: 1px solid #333; padding-bottom: 5px;
+}
+
+/* WELCOME PANEL */
+.welcome-panel {
+    background: var(--bg-row-a); border: 1px solid #000; padding: 6px;
+    margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
+}
+.welcome-text { font-size: 10px; }
+
+/* FORUM TABLE STYLES */
+.forum-table {
+    width: 100%; border-collapse: separate; border-spacing: 1px;
+    background: var(--border); margin-bottom: 20px;
+}
+
+.cat-header {
+    background: var(--header-grad);
+    color: var(--header-text);
+    font-weight: bold; font-size: 11px; padding: 6px;
+    border: 1px solid #444; border-bottom: none;
+}
+
+.thead-row th {
+    background: var(--accent); color: #fff; font-weight: normal; padding: 4px; text-align: left; font-size: 10px;
+}
+
+.forum-row td {
+    padding: 6px; vertical-align: middle;
+}
+.row-a { background: var(--bg-row-a); }
+.row-b { background: var(--bg-row-b); }
+
+/* ICONS */
+.f-icon { font-size: 24px; text-align: center; color: #666; width: 40px; }
+.f-icon.new { color: var(--link); }
+
+.forum-title { font-size: 12px; font-weight: bold; color: #fff; }
+.forum-desc { font-size: 10px; color: #888; margin-top: 2px; }
+.last-post { font-size: 9px; line-height: 1.2; }
+
+/* THREAD VIEW */
+.thread-header { background: #000; color: #fff; padding: 10px; font-weight: bold; font-size: 14px; margin-bottom: 10px; border-left: 5px solid var(--link); }
+.post-container { margin-bottom: 10px; width: 100%; border-spacing: 1px; background: #000; }
+.post-meta { width: 180px; background: var(--bg-row-b); padding: 10px; vertical-align: top; font-size: 10px; border-right: 1px solid #000; }
+.post-content { background: var(--bg-row-a); padding: 15px; vertical-align: top; min-height: 100px; font-size: 12px; line-height: 1.5; }
+.post-date { background: #333; color: #ccc; padding: 4px; font-size: 9px; }
+
+/* MARKDOWN STYLES IN POSTS */
+.post-content h1 { font-size: 16px; border-bottom: 1px solid #444; color: var(--highlight); }
+.post-content pre { background: #000; border: 1px solid #333; padding: 10px; overflow-x: auto; color: var(--link); font-family: monospace; }
+.post-content blockquote { border-left: 3px solid #555; margin: 10px; padding-left: 10px; color: #888; }
+
+/* STATS */
+.forum-stats { background: var(--border); padding: 1px; margin-top: 20px; }
+.stat-row { background: var(--bg-row-a); padding: 6px; display: flex; gap: 10px; align-items: center; }
+.stat-icon { font-size: 30px; padding: 0 10px; }
+.user-link { font-weight: bold; }
+.user-link.admin { color: #f00; }
+.user-link.mod { color: #0f0; }
+.tiny { font-size: 9px; }
+
+.footer { text-align: center; font-size: 9px; color: #666; margin-top: 20px; padding-bottom: 20px; }
+
+/* UI ELEMENTS */
+.vb-btn {
+    background: #333; border: 1px solid #555; color: #fff; padding: 3px 8px; font-size: 10px; cursor: pointer;
+}
+.vb-btn:hover { background: #444; border-color: #888; }
+.vb-btn.alt { background: #000; }
+
 .hidden { display: none !important; }
-
-/* DESKTOP GRID */
-.desktop-grid {
-    position: absolute; top: 40px; left: 80px; display: grid;
-    grid-template-columns: repeat(auto-fill, 100px); gap: 20px;
+.overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 100;
 }
-.desktop-icon {
-    width: 90px; height: 90px; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; cursor: pointer;
-    border-radius: 5px; transition: 0.2s;
+.vb-modal {
+    width: 400px; background: var(--bg-row-a); border: 1px solid #555;
+    box-shadow: 0 0 20px #000;
 }
-.desktop-icon:hover { background: rgba(255,255,255,0.1); }
-.d-icon { font-size: 40px; margin-bottom: 5px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-.d-label { font-size: 12px; color: #fff; text-shadow: 0 1px 2px #000; text-align: center; }
+.modal-body { padding: 20px; text-align: center; }
+.modal-btns { margin-top: 20px; display: flex; gap: 10px; justify-content: center; }
 
-/* WINDOW SYSTEM */
-.os-window {
-    position: absolute; background: var(--win-bg); border-radius: 8px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6); border: 1px solid #333;
-    display: flex; flex-direction: column; overflow: hidden;
-    backdrop-filter: blur(5px); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-@keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-.window-header {
-    height: 32px; background: #222; border-bottom: 1px solid #000;
-    display: flex; align-items: center; padding: 0 10px; cursor: grab;
-}
-.window-header:active { cursor: grabbing; }
-.win-controls { display: flex; gap: 8px; margin-right: 15px; }
-.win-btn { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; }
-.close { background: #ff5555; }
-.min { background: #f1c40f; }
-.max { background: #2ecc71; }
-.win-title { font-size: 13px; font-weight: bold; color: #aaa; flex: 1; text-align: center; }
-
-/* APP: DISCORD STYLE */
-.discord-layout { display: flex; height: 100%; font-family: 'Roboto', sans-serif; }
-.discord-sidebar {
-    width: 200px; background: #2f3136; padding: 10px; display: flex; flex-direction: column; gap: 5px;
-}
-.channel-group { font-size: 11px; font-weight: bold; color: #8e9297; margin: 10px 0 5px 5px; }
-.channel {
-    padding: 6px 8px; color: #8e9297; font-size: 14px; border-radius: 4px; cursor: pointer;
-}
-.channel:hover { background: #393c43; color: #dcddde; }
-.channel.active { background: #393c43; color: #fff; }
-
-.discord-chat { flex: 1; background: #36393f; display: flex; flex-direction: column; }
-.chat-header {
-    height: 48px; border-bottom: 1px solid #202225; padding: 0 16px;
-    display: flex; align-items: center; color: #fff; font-weight: bold;
-}
-.hash { color: #8e9297; margin-right: 5px; font-size: 20px; }
-.topic { color: #b9bbbe; font-weight: normal; font-size: 12px; margin-left: 10px; }
-
-.chat-feed { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-.msg { display: flex; gap: 10px; }
-.avatar { width: 40px; height: 40px; border-radius: 50%; background: #5865F2; flex-shrink: 0; }
-.msg-content { color: #dcddde; font-size: 14px; line-height: 1.4; }
-.msg-user { color: #fff; font-weight: bold; margin-right: 5px; }
-.msg-time { color: #72767d; font-size: 10px; }
-.mention { background: rgba(88, 101, 242, 0.3); color: #dee0fc; padding: 0 2px; border-radius: 3px; }
-
-.chat-input-area { padding: 20px; }
-.chat-input-fake {
-    background: #40444b; color: #72767d; padding: 10px; border-radius: 8px; font-size: 14px;
-}
-
-.discord-users { width: 180px; background: #2f3136; padding: 20px 10px; }
-.role-header { font-size: 11px; font-weight: bold; color: #8e9297; margin-bottom: 10px; }
-.user { color: #8e9297; margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; gap: 5px; }
-.user::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #3ba55c; }
-.user.owner { color: var(--owrt-purple); }
-
-/* APP: FILE MANAGER */
-.file-layout { display: flex; flex-direction: column; height: 100%; background: #1e1e1e; }
-.file-path-bar {
-    height: 40px; border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 10px; gap: 10px;
-}
-.path-btn { width: 24px; height: 24px; background: #333; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #aaa; cursor: pointer; }
-.path-text { background: #000; color: var(--term-green); padding: 5px 10px; border-radius: 4px; font-family: var(--font-term); flex: 1; }
-
-.file-grid { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, 100px); gap: 15px; }
-.file-item {
-    display: flex; flex-direction: column; align-items: center; cursor: pointer;
-    padding: 10px; border-radius: 5px;
-}
-.file-item:hover { background: rgba(255,255,255,0.05); }
-.f-icon { font-size: 40px; margin-bottom: 5px; }
-.f-name { font-size: 12px; color: #ddd; text-align: center; word-break: break-all; }
-
-/* APP: TERMINAL READER */
-.terminal-body { background: #000; color: #ccc; font-family: var(--font-term); font-size: 18px; display: flex; flex-direction: column; height: 100%; }
-.term-text { flex: 1; padding: 15px; overflow-y: auto; white-space: pre-wrap; color: var(--text-main); }
-.term-text h1 { color: var(--term-green); border-bottom: 1px dashed var(--term-green); }
-.term-text h2 { color: var(--owrt-cyan); margin-top: 20px; }
-.term-text code { color: var(--owrt-purple); }
-.term-status-bar { background: #fff; color: #000; padding: 2px 10px; font-size: 16px; }
+/* LEADERBOARD TABLE */
+.lb-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.lb-table th { text-align: left; border-bottom: 1px solid #444; color: var(--highlight); }
+.lb-table td { padding: 5px; border-bottom: 1px solid #333; }
+.rank-gold { color: #ffd700; font-weight: bold; }

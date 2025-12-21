@@ -2,150 +2,88 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ci5buntu [NET]</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ci5 Sovereign Network - Powered by vBulletin</title>
     <link rel="stylesheet" href="static/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://ci5.run/static/signal.png">
+    <link href="https://fonts.googleapis.com/css2?family=Verdana:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="top-bar">
-        <div class="top-left">
-            <span class="activity">Activities</span>
-            <span class="app-name" id="activeApp">Desktop</span>
-        </div>
-        <div class="top-center">
-            <span class="clock">Sat 20 Dec 14:02</span>
-        </div>
-        <div class="top-right">
-            <span class="status-icon">▼</span>
-            <span class="status-icon">🔋</span>
-            <span class="status-icon">🔈</span>
-        </div>
-    </div>
-
-    <div class="dock">
-        <div class="dock-item" onclick="openWindow('community')" title="Ci5 Community">
-            <div class="icon-box discord">#</div>
-            <div class="dot hidden" id="dot-comm"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('files')" title="File System">
-            <div class="icon-box folder">/</div>
-            <div class="dot hidden" id="dot-files"></div>
-        </div>
-        <div class="dock-item" onclick="window.location='https://ci5.run'" title="Terminal Uplink">
-            <div class="icon-box term">>_</div>
-        </div>
-        <div class="dock-spacer"></div>
-        <div class="dock-item" title="Trash">
-            <div class="icon-box trash">🗑</div>
-        </div>
-    </div>
-
-    <div class="desktop-grid">
-        <div class="desktop-icon" onclick="openWindow('files')">
-            <div class="d-icon">📁</div>
-            <div class="d-label">Ci5_Docs</div>
-        </div>
-        <div class="desktop-icon" onclick="openWindow('community')">
-            <div class="d-icon">💬</div>
-            <div class="d-label">Community</div>
-        </div>
-        <div class="desktop-icon" onclick="window.open('https://github.com/dreamswag/ci5', '_blank')">
-            <div class="d-icon">🐙</div>
-            <div class="d-label">Source_Code</div>
-        </div>
-    </div>
-
-    <div class="os-window hidden" id="win-community" style="width: 900px; height: 600px; top: 50%; left: 55%;">
-        <div class="window-header" id="drag-comm">
-            <div class="win-controls">
-                <div class="win-btn close" onclick="closeWindow('community')"></div>
-                <div class="win-btn min"></div>
-                <div class="win-btn max"></div>
+    <div class="vb-header">
+        <div class="logo-area">
+            <img src="https://ci5.run/static/signal.png" class="vb-logo" alt="Ci5">
+            <div class="logo-text">
+                <div class="brand">Ci5 Network</div>
+                <div class="slogan">Sovereign Infrastructure & Community</div>
             </div>
-            <div class="win-title">Ci5 Community Relay</div>
         </div>
-        <div class="window-body discord-layout">
-            <div class="discord-sidebar">
-                <div class="channel-group">CHANNELS</div>
-                <div class="channel active" onclick="switchChannel('general')"># general</div>
-                <div class="channel" onclick="switchChannel('builds')"># monster-builds</div>
-                <div class="channel" onclick="switchChannel('help')"># queries-help</div>
-                <div class="channel-group">METADATA</div>
-                <div class="channel" onclick="window.open('https://github.com/dreamswag/ci5/discussions')">↗ open_github</div>
-            </div>
-            <div class="discord-chat">
-                <div class="chat-header">
-                    <span class="hash">#</span> <span id="chat-title">general</span>
-                    <span class="topic"> // The Sovereign Lounge</span>
-                </div>
-                <div class="chat-feed" id="chat-feed">
-                    </div>
-                <div class="chat-input-area">
-                    <div class="chat-input-fake">You are viewing in Read-Only Mode. Authenticate via GitHub to post.</div>
-                </div>
-            </div>
-            <div class="discord-users">
-                <div class="role-header">CREATOR</div>
-                <div class="user owner">dreamswag</div>
-                <div class="role-header">SOVEREIGNS — 12,847</div>
-                <div class="user">anon_192</div>
-                <div class="user">net_runner</div>
-                <div class="user">pi_guy_5</div>
+        <div class="top-banner">
+            <div class="banner-box">
+                <span class="green">>> SYSTEM STATUS:</span> OPTIMAL<br>
+                <span class="cyan">>> NODES ONLINE:</span> 12,847
             </div>
         </div>
     </div>
 
-    <div class="os-window hidden" id="win-files" style="width: 700px; height: 500px; top: 45%; left: 45%;">
-        <div class="window-header" id="drag-files">
-            <div class="win-controls">
-                <div class="win-btn close" onclick="closeWindow('files')"></div>
-                <div class="win-btn min"></div>
-                <div class="win-btn max"></div>
-            </div>
-            <div class="win-title">/home/root/docs</div>
-        </div>
-        <div class="window-body file-layout">
-            <div class="file-path-bar">
-                <div class="path-btn">&lt;</div>
-                <div class="path-btn">&gt;</div>
-                <div class="path-text">/var/www/ci5/docs/</div>
-            </div>
-            <div class="file-grid">
-                <div class="file-item" onclick="openFile('HG.md')">
-                    <div class="f-icon">📄</div>
-                    <div class="f-name">Hardware_Guide.md</div>
-                </div>
-                <div class="file-item" onclick="openFile('SEC.md')">
-                    <div class="f-icon">🔐</div>
-                    <div class="f-name">Security.md</div>
-                </div>
-                <div class="file-item" onclick="openFile('MNT.md')">
-                    <div class="f-icon">🛠</div>
-                    <div class="f-name">Maintenance.md</div>
-                </div>
-                <div class="file-item" onclick="openFile('SUP.md')">
-                    <div class="f-icon">❓</div>
-                    <div class="f-name">Support_FAQ.md</div>
-                </div>
-            </div>
+    <div class="vb-navbar">
+        <div class="nav-links">
+            <a href="#" onclick="loadIndex()">User CP</a>
+            <a href="#" onclick="loadIndex()">FAQ</a>
+            <a href="#" onclick="loadIndex()">Members List</a>
+            <a href="#" onclick="loadIndex()">Calendar</a>
+            <a href="#" onclick="loadIndex()">New Posts</a>
+            <a href="#" onclick="loadIndex()">Search</a>
         </div>
     </div>
 
-    <div class="os-window hidden" id="win-viewer" style="width: 600px; height: 700px; top: 40%; left: 60%; z-index: 100;">
-        <div class="window-header" id="drag-viewer">
-            <div class="win-controls">
-                <div class="win-btn close" onclick="closeWindow('viewer')"></div>
-                <div class="win-btn min"></div>
-                <div class="win-btn max"></div>
-            </div>
-            <div class="win-title" id="viewer-title">nano reader</div>
+    <div class="vb-body">
+        <div class="breadcrumb">
+            <span class="crumb-icon">🏠</span> 
+            <span id="nav-trail">Ci5 Network > Forums > Index</span>
         </div>
-        <div class="window-body terminal-body">
-            <div id="file-content" class="term-text"></div>
-            <div class="term-status-bar">
-                [ Read 142 lines ] ^X Exit
+
+        <div class="welcome-panel" id="guest-panel">
+            <div class="welcome-text">
+                <strong>Welcome, Guest.</strong><br>
+                Please <a href="#" onclick="openAuth()">login with GitHub</a> to post replies.
+            </div>
+            <div class="login-inputs">
+                <button class="vb-btn" onclick="openAuth()">GitHub Connect</button>
+            </div>
+        </div>
+
+        <div id="main-content">
+            </div>
+
+        <div class="forum-stats">
+            <div class="cat-header">What's Going On?</div>
+            <div class="stat-row">
+                <div class="stat-icon">👥</div>
+                <div class="stat-text">
+                    Currently Active Users: <strong>412</strong> (12 members and 400 guests)<br>
+                    <span class="tiny">Most users ever online was 12,847, Today at 14:02.</span><br>
+                    <span class="user-link admin">dreamswag</span>, <span class="user-link mod">net_runner</span>, <span class="user-link">anon_user</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Powered by Ci5 Engine 7.4.1<br>
+            Copyright © 2025 Dreamswag Foundation.
+        </div>
+    </div>
+
+    <div class="overlay hidden" id="auth-modal">
+        <div class="vb-modal">
+            <div class="cat-header">vBulletin Message</div>
+            <div class="modal-body">
+                <p>You are about to log in via <strong>GitHub OAuth</strong>.</p>
+                <p>This will link your identity to your sovereign node.</p>
+                <div class="modal-btns">
+                    <button class="vb-btn" onclick="mockLogin()">Proceed</button>
+                    <button class="vb-btn alt" onclick="closeAuth()">Go Back</button>
+                </div>
             </div>
         </div>
     </div>
