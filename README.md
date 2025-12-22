@@ -38,7 +38,7 @@ Transform a £70 board into a **sovereign routing engine** with:
 - Custom Enclosures
 - Cooling Mods
 - HAT Implementations
-  - (*2.5G NIC / nVME etc.*)
+  - (*2.5Gbps NIC / nVME etc.*)
 
 ### 📊 [METRICS](https://github.com/dreamswag/ci5.network/discussions/categories/metrics)
 **Performance Proof**: 
@@ -51,7 +51,7 @@ Transform a £70 board into a **sovereign routing engine** with:
 
 ---
 
-## ⛓️ Uncensored Access
+## ⛓️ Censorship-Resistant Access
 
 If conventional DNS becomes inaccessible, core assets are anchored on-chain:
 
