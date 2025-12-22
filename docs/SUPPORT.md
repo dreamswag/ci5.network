@@ -2,15 +2,17 @@
 
 ## Status: "Works on My Machine" Ware
 
-Ci5 is a reference implementation, not a managed product. It works on the Golden Hardware Stack. Deviations are unsupported.
+**Ci5 is a reference implementation** - which works on the Reference Hardware Stack.  
 
----
+Community Corks may change the ease of deployment for various alternative hardware down the line.
+
+Deviations are not officially supported until such corks (_do / do not_) arise. 
 
 ## Before Asking for Help
 
 ### Pre-Submission Checklist
 
-- [ ] Running Golden Hardware Stack? (8GB Pi 5, RTL8153 NIC, VLAN-capable AP)
+- [ ] Running mandatory hardware? (4GB+ Pi 5, NIC, VLAN-capable AP)
 - [ ] Read relevant documentation?
 - [ ] Ran `validate.sh`?
 - [ ] Generated `bone_marrow.sh` report?
@@ -30,7 +32,6 @@ If you answered "no" to any of these, resolve them before proceeding.
 | Security vulnerability | Private disclosure | Reviewed |
 | Documentation error | Incorrect command in docs | PR accepted |
 
----
 
 ## Invalid Support Requests
 
@@ -39,27 +40,7 @@ If you answered "no" to any of these, resolve them before proceeding.
 | "Doesn't work" | No details | Ignored |
 | Pi 4 issues | Any | Unsupported |
 | 4GB OOM | Full stack on 4GB | Expected behavior |
-| ISP-specific | "My ISP uses weird VLANs" | Your problem |
-| User modification | "I changed X, now Y broke" | You broke it |
 | Missing `bone_marrow.sh` | Issue without diagnostics | Incomplete |
-
----
-
-## Community Resources
-
-### GitHub Discussions
-
-| Category | Purpose |
-|----------|---------|
-| [INTEL_REQ](https://github.com/dreamswag/ci5.network/discussions/categories/intel_req) | Troubleshooting questions |
-| [ARMORY](https://github.com/dreamswag/ci5.network/discussions/categories/armory) | Hardware showcase |
-| [METRICS](https://github.com/dreamswag/ci5.network/discussions/categories/metrics) | Performance benchmarks |
-
-### External Communities
-
-- r/openwrt
-- r/homelab
-- r/networking
 
 ---
 
@@ -109,7 +90,7 @@ scp root@192.168.99.1:/root/*_bone_marrow_*.md ./
 | Fixed | Document for yourself |
 | Persists | New `bone_marrow.sh`, repeat Step 3 |
 | Bricked | Re-flash (10 minutes) |
-| Exhausted | Post to Reddit with full context |
+| Exhausted | Post to [INTEL_REQ](https://github.com/dreamswag/ci5.network/discussions/categories/intel_req) with full context |
 
 ---
 
@@ -153,4 +134,4 @@ MIT. Do whatever you want. Attribution appreciated but not required.
 
 **For security vulnerabilities:** Open a private security advisory on GitHub.
 
-**For everything else:** Don't.
+**For everything else:** Don't. Use the [INTEL_REQ](https://github.com/dreamswag/ci5.network/discussions/categories/intel_req) and pray.
