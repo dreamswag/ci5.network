@@ -4,8 +4,8 @@
 
 Ci5 separates network infrastructure into two distinct planes:
 
-1. **Fast Path** (Kernel) — Routing, NAT, SQM/CAKE, BBR, Unbound
-2. **Smart Path** (Docker) — IDS, IPS, Traffic Analysis, Ad Blocking
+1. **Fast Path** (Kernel): Routing, NAT, SQM/CAKE, BBR, Unbound
+2. **Smart Path** (Docker): IDS, IPS, Traffic Analysis, Ad Blocking
 
 This hybrid model ensures **network connectivity survives container failures**.
 
@@ -13,7 +13,11 @@ This hybrid model ensures **network connectivity survives container failures**.
 
 ## Terminology
 
-**Corks** are Docker containers. This is Ci5 nomenclature for sandboxed applications that run in the Pi 5's "Leeway" RAM — memory not required for core routing functions. The term is used exclusively throughout this documentation after this definition.
+**Corks** are Docker containers. 
+* Ci5 nomenclature for sandboxed applications that run in the Pi 5's "Leeway" RAM
+   * (memory not required for core routing functions). 
+ 
+The term will be used exclusively throughout documentation.
 
 ---
 
@@ -24,7 +28,7 @@ This hybrid model ensures **network connectivity survives container failures**.
 | **Fast Path** | Bare metal kernel | Routing, NAT, CAKE, BBR, Unbound | N/A (kernel) |
 | **Smart Path** | Isolated Docker | Suricata, CrowdSec, Ntopng, AdGuard | Internet stays up |
 
-If Docker dies, you lose visibility and filtering — but packets still flow.
+If Docker dies, you lose visibility and filtering - but packets still flow.
 
 ---
 
