@@ -37,35 +37,35 @@ If Docker dies, you lose visibility and filtering - but packets still flow.
 Ci5 spans five domains with distinct responsibilities:
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         USER                                     │
-│                           │                                      │
-│                     curl ci5.run/free                            │
-│                           │                                      │
-│                           ▼                                      │
-│   ┌─────────────────────────────────────────────────────────┐   │
-│   │                    ci5.run                               │   │
-│   │              (Entry Point / Router)                      │   │
-│   │         Redirects to appropriate scripts                 │   │
-│   └─────────────────────────────────────────────────────────┘   │
-│                           │                                      │
-│           ┌───────────────┼───────────────┐                      │
-│           ▼               ▼               ▼                      │
-│   ┌─────────────┐ ┌─────────────┐ ┌─────────────┐               │
-│   │    ci5      │ │  ci5.host   │ │  ci5.dev    │               │
-│   │ (Core Repo) │ │  (Auditor)  │ │ (Registry)  │               │
-│   │ Scripts +   │ │  Overlay    │ │  Cork DB    │               │
-│   │ Configs     │ │  Sandbox    │ │  + Metadata │               │
-│   └─────────────┘ └─────────────┘ └─────────────┘               │
-│           │               │               │                      │
-│           └───────────────┼───────────────┘                      │
-│                           ▼                                      │
-│   ┌─────────────────────────────────────────────────────────┐   │
-│   │                  ci5.network                             │   │
-│   │            (Documentation Hub)                           │   │
-│   │        Central source of truth                           │   │
-│   └─────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│                         USER                         │
+│                           │                          │
+│                     curl ci5.run/free                │
+│                           │                          │
+│                           ▼                          │
+│   ┌──────────────────────────────────────────────┐   │
+│   │                    ci5.run                   │   │
+│   │              (Entry Point / Router)          │   │
+│   │         Redirects to appropriate scripts     │   │
+│   └──────────────────────────────────────────────┘   │
+│                           │                          │
+│           ┌───────────────┼───────────────┐          │
+│           ▼               ▼               ▼          │
+│   ┌─────────────┐ ┌─────────────┐ ┌─────────────┐    │
+│   │    ci5      │ │  ci5.host   │ │  ci5.dev    │    │
+│   │ (Core Repo) │ │  (Auditor)  │ │ (Registry)  │    │
+│   │ Scripts +   │ │  Overlay    │ │  Cork DB    │    │  
+│   │ Configs     │ │  Sandbox    │ │  + Metadata │    │
+│   └─────────────┘ └─────────────┘ └─────────────┘    │
+│           │               │               │          │
+│           └───────────────┼───────────────┘          │
+│                           ▼                          │
+│   ┌────────────────────────────────────────────┐     │ 
+│   │                 ci5.network                │     │   
+│   │            (Documentation Hub)             │     │   
+│   │        Central source of truth             │     │   
+│   └────────────────────────────────────────────┘     │
+└──────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -154,7 +154,6 @@ Ci5 spans five domains with distinct responsibilities:
 
 | Cork | Purpose | RAM |
 |------|---------|-----|
-| AdGuard Home | DNS filtering | ~128MB |
 | Unbound | Recursive resolver | ~64MB |
 
 ### Full Stack Corks (Optional)
@@ -165,6 +164,7 @@ Ci5 spans five domains with distinct responsibilities:
 | CrowdSec | IPS (threat intelligence) | ~128MB | `full` |
 | Ntopng | Traffic analysis | ~256MB | `full` |
 | Redis | Data store for Ntopng | ~64MB | `full` |
+| AdGuard Home | DNS filtering | ~128MB | `full` |
 
 ### Community Corks (Registry)
 
