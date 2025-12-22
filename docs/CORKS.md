@@ -2,9 +2,9 @@
 
 ## Overview
 
-Corks are Docker containers designed to utilize the Pi 5's "Leeway" RAM — memory not required for core routing functions. This document covers the registry system and security auditing procedures.
+Corks are Docker containers designed to utilize the Pi 5's "Leeway" RAM. 
 
----
+This document covers the registry system and security auditing procedures.
 
 ## The Registry
 
@@ -90,7 +90,9 @@ Before installing community Corks, audit them for host-infection attempts.
 
 ### The Problem
 
-On standard ext4 filesystems, there's no read-only safety net. A malicious container could:
+On standard ext4 filesystems, there's no read-only safety net. 
+
+A malicious container could:
 - Modify `/etc/config`
 - Install backdoors
 - Compromise routing
@@ -217,3 +219,5 @@ sh /root/ci5/extras/uninstallers/partial-uninstall.sh
 ```
 
 Interactive menu for selective component removal.
+
+---
