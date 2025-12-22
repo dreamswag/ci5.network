@@ -30,14 +30,18 @@ Transform a £70 board into a **sovereign routing engine** with:
 ## 📡 Community Protocols
 
 ### 🚨 [INTEL_REQ](https://github.com/dreamswag/ci5.network/discussions/categories/intel_req)
-**Unsolved Queries** - Post malfunctions here. Include `bone_marrow.sh` output.
+**Unsolved Queries**:
+
+- Malfunctions.
+    - Include `bone_marrow.sh` output.
+- General troubleshooting queries. 
 
 ### 🛠️ [ARMORY](https://github.com/dreamswag/ci5.network/discussions/categories/armory)
 **Hardware Showcase**: 
 
-- Custom Enclosures
-- Cooling Mods
-- HAT Implementations
+- Custom Enclosures.
+- Cooling Mods.
+- HAT Implementations.
   - (*2.5Gbps NIC / nVME etc.*)
 
 ### 📊 [METRICS](https://github.com/dreamswag/ci5.network/discussions/categories/metrics)
@@ -90,27 +94,27 @@ ci5.network/
 
 ```
          ┌─────────────────────────────────────┐
-         │            USER                      │
-         │              │                       │
-         │        curl ci5.run/free             │
-         │              │                       │
-         │              ▼                       │
+         │            USER                     │
+         │              │                      │
+         │        curl ci5.run/free            │
+         │              │                      │
+         │              ▼                      │
          │  ┌───────────────────────┐          │
          │  │      ci5.run          │          │
          │  │    (Bootloader)       │          │
          │  └───────────┬───────────┘          │
-         │              │                       │
+         │              │                      │
          │    ┌─────────┼─────────┐            │
          │    ▼         ▼         ▼            │
-         │ ┌─────┐  ┌───────┐  ┌───────┐       │
-         │ │ ci5 │  │ci5.host│  │ci5.dev│      │
-         │ │Core │  │ Audit │  │Registry│      │
-         │ └─────┘  └───────┘  └───────┘       │
+         │ ┌─────┐  ┌────────┐   ┌────────┐    │
+         │ │ ci5 │  │ci5.host│   │ ci5.dev│    │
+         │ │Core │  │ Audit  │   │  Corks │    │
+         │ └─────┘  └────────┘   └────────┘    │
          │    │         │         │            │
          │    └─────────┼─────────┘            │
-         │              ▼                       │
+         │              ▼                      │
          │  ┌───────────────────────┐          │
-         │  │    ci5.network        │◀── YOU   │
+         │  │    ci5.network        │◀── YOU  │
          │  │  (Documentation)      │   ARE    │
          │  └───────────────────────┘   HERE   │
          └─────────────────────────────────────┘
