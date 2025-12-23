@@ -1,244 +1,767 @@
-/* Ci5 vBulletin Logic Engine */
+/* ============================================
+   ci5.network Forums — Core Logic
+   GitHub Discussions API + Device Flow Auth
+   ============================================ */
 
-// --- CONTENT DATABASE ---
-const DOCS = {
-    'hardware': {
-        title: "Sticky: Official Hardware Guide (The Golden Stack)",
-        author: "dreamswag",
-        date: "Yesterday, 14:02",
-        content: `# The Golden Stack Architecture\n\nTo achieve the **1.74Gbps** throughput claim with 0ms bufferbloat, specific hardware is required.\n\n### 1. Compute: Raspberry Pi 5 (8GB)\nThe Cortex-A76 cores are mandatory for handling Suricata at line rate. The Pi 4 cannot keep up with the instruction set requirements for the new IDS engine.\n\n### 2. Interface: RTL8153 USB 3.0\nWhile many USB NICs exist, the RTL8153 (or AX88179) has been verified for driver stability in the Ci5 kernel tweaks.\n\n> **Note:** Do not use cheap "driverless" dongles. They will cause packet drops under load.`
+// ===== CONFIGURATION =====
+const CONFIG = {
+    // GitHub OAuth App Client ID (replace with yours)
+    clientId: 'YOUR_GITHUB_CLIENT_ID',
+    
+    // Repos to aggregate
+    repos: [
+        { owner: 'dreamswag', repo: 'ci5.network', label: 'ci5.network' },
+        { owner: 'dreamswag', repo: 'ci5', label: 'ci5' },
+        { owner: 'dreamswag', repo: 'ci5.host', label: 'ci5.host' },
+        { owner: 'dreamswag', repo: 'ci5.dev', label: 'ci5.dev' }
+    ],
+    
+    // Category mappings
+    categories: {
+        'metrics': { repo: 'ci5.network', ghCategory: 'METRICS', title: 'RRUL Submissions' },
+        'announcements': { repo: 'ci5.network', ghCategory: 'Announcements', title: 'Announcements' },
+        'intel_req': { repo: 'ci5.network', ghCategory: 'INTEL_REQ', title: 'INTEL_REQ' },
+        'armory': { repo: 'ci5.network', ghCategory: 'ARMORY', title: 'ARMORY' },
+        'cork-submissions': { repo: 'ci5.dev', ghCategory: 'General', title: 'Cork Submissions' }
     },
-    'security': {
-        title: "Sticky: Security Protocols & VLANs",
-        author: "dreamswag",
-        date: "Today, 09:00",
-        content: `# Network Hardening\n\nDefault firewall zones are strict. \n\n* **LAN:** Trusted. Access to gateway.\n* **IoT:** Isolated. No WAN access unless whitelisted via Cork.\n* **GUEST:** Client isolation active.\n\n### SSH Keys\nPassword auth is disabled by default in the 'safe' installer. You must use the key provided during the 'bootstrap' phase.`
-    },
-    'maintenance': {
-        title: "Sticky: Self-Healing & Maintenance",
-        author: "dreamswag",
-        date: "Today, 08:30",
-        content: `Run \`sh bone_marrow.sh\` to generate a diagnostic report. The system auto-updates blocklists at 03:00 UTC.`
+    
+    // API endpoints
+    api: {
+        leaderboard: '/api/leaderboard',
+        blacklist: '/api/blacklist',
+        submit: '/api/submit',
+        deviceCode: '/api/auth/device-code',
+        pollToken: '/api/auth/poll-token'
     }
 };
 
-const CHATS = [
-    { id: 1, title: "Just hit 500Mbps on RRUL test!", user: "net_runner", replies: 14, views: 302, last: "Today 13:42" },
-    { id: 2, title: "[Showcase] My Pi 5 Cluster Rack", user: "pi_guy", replies: 8, views: 155, last: "Today 12:00" },
-    { id: 3, title: "Help: AdGuard container restarting?", user: "newbie_101", replies: 2, views: 40, last: "Today 10:15" },
-    { id: 4, title: "Request: UniFi Controller Cork", user: "ubnt_fan", replies: 0, views: 12, last: "Yesterday 23:00" }
-];
+// ===== STATE =====
+const state = {
+    user: null,
+    accessToken: localStorage.getItem('gh_token'),
+    currentView: 'index',
+    currentCategory: null,
+    currentThread: null,
+    currentRepo: 'all',
+    deviceFlowInterval: null
+};
 
-// --- RENDERERS ---
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+    initNavigation();
+    initRepoTabs();
+    checkAuth();
+    loadForumData();
+});
 
-function loadIndex() {
-    document.getElementById('nav-trail').innerText = "Ci5 Network > Forums > Index";
-    const main = document.getElementById('main-content');
-    
-    main.innerHTML = `
-        <div class="forum-table">
-            <div class="cat-header">Sovereign Documentation (Read Only)</div>
-            <table width="100%" cellpadding="0" cellspacing="1">
-                <tr class="thead-row">
-                    <th width="5%">&nbsp;</th>
-                    <th width="50%">Forum</th>
-                    <th width="10%">Threads</th>
-                    <th width="10%">Posts</th>
-                    <th width="25%">Last Post</th>
-                </tr>
-                <tr class="forum-row row-a">
-                    <td align="center"><div class="f-icon new">🔒</div></td>
-                    <td>
-                        <div class="forum-title"><a href="#" onclick="viewThread('hardware')">Hardware Guide</a></div>
-                        <div class="forum-desc">Reference architecture specifications and BOM.</div>
-                    </td>
-                    <td align="center">1</td>
-                    <td align="center">1</td>
-                    <td class="last-post">By dreamswag<br>Yesterday 14:02</td>
-                </tr>
-                <tr class="forum-row row-b">
-                    <td align="center"><div class="f-icon new">🔒</div></td>
-                    <td>
-                        <div class="forum-title"><a href="#" onclick="viewThread('security')">Security Protocols</a></div>
-                        <div class="forum-desc">VLANs, IDS tuning, and Firewall Zones.</div>
-                    </td>
-                    <td align="center">1</td>
-                    <td align="center">1</td>
-                    <td class="last-post">By dreamswag<br>Today 09:00</td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="forum-table">
-            <div class="cat-header">The Arena (Benchmarks)</div>
-            <table width="100%" cellpadding="0" cellspacing="1">
-                <tr class="thead-row">
-                    <th width="5%">&nbsp;</th>
-                    <th width="50%">Forum</th>
-                    <th width="10%">Threads</th>
-                    <th width="10%">Posts</th>
-                    <th width="25%">Last Post</th>
-                </tr>
-                <tr class="forum-row row-a">
-                    <td align="center"><div class="f-icon new">🏆</div></td>
-                    <td>
-                        <div class="forum-title"><a href="#" onclick="viewLeaderboard()">St. Guinea CiG Leaderboard</a></div>
-                        <div class="forum-desc">Official 1.74Gbps Gauntlet submissions and verifications.</div>
-                    </td>
-                    <td align="center">142</td>
-                    <td align="center">8,204</td>
-                    <td class="last-post">By net_runner<br>Today 13:42</td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="forum-table">
-            <div class="cat-header">Community Signals (GitHub Relay)</div>
-            <table width="100%" cellpadding="0" cellspacing="1">
-                <tr class="thead-row">
-                    <th width="5%">&nbsp;</th>
-                    <th width="50%">Forum</th>
-                    <th width="10%">Threads</th>
-                    <th width="10%">Posts</th>
-                    <th width="25%">Last Post</th>
-                </tr>
-                <tr class="forum-row row-a">
-                    <td align="center"><div class="f-icon">💬</div></td>
-                    <td>
-                        <div class="forum-title"><a href="#" onclick="viewCommunity()">General Discussion</a></div>
-                        <div class="forum-desc">Talk about setups, troubleshooting, and cork requests.</div>
-                    </td>
-                    <td align="center">1,203</td>
-                    <td align="center">14,201</td>
-                    <td class="last-post">By newbie_101<br>Today 10:15</td>
-                </tr>
-            </table>
-        </div>
-    `;
+function initNavigation() {
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const view = link.dataset.view;
+            if (view) switchView(view);
+        });
+    });
 }
 
-function viewThread(id) {
-    const doc = DOCS[id];
-    document.getElementById('nav-trail').innerText = `Ci5 Network > Forums > Docs > ${doc.title}`;
-    const main = document.getElementById('main-content');
-    
-    main.innerHTML = `
-        <div class="thread-header">${doc.title}</div>
-        <div class="vb-btn" style="margin-bottom:10px;" onclick="loadIndex()">&lt; Back to Index</div>
-        
-        <table class="post-container">
-            <tr>
-                <td class="post-date">${doc.date}</td>
-            </tr>
-            <tr>
-                <td class="post-meta">
-                    <div style="font-size:14px; font-weight:bold; color:var(--highlight);">${doc.author}</div>
-                    <div class="tiny">Architect</div>
-                    <div style="margin-top:5px;"><img src="https://github.com/identicons/dreamswag.png" width="50"></div>
-                    <div class="tiny" style="margin-top:5px;">
-                        Join Date: Dec 2024<br>
-                        Posts: 4,096
-                    </div>
-                </td>
-                <td class="post-content">
-                    ${parseMarkdown(doc.content)}
-                </td>
-            </tr>
-        </table>
-    `;
+function initRepoTabs() {
+    document.querySelectorAll('.repo-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            e.preventDefault();
+            const repo = tab.dataset.repo;
+            filterByRepo(repo);
+            document.querySelectorAll('.repo-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+        });
+    });
 }
 
-function viewLeaderboard() {
-    document.getElementById('nav-trail').innerText = `Ci5 Network > Forums > Arena > Leaderboard`;
-    const main = document.getElementById('main-content');
+// ===== VIEW MANAGEMENT =====
+function switchView(view) {
+    document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+    const panel = document.getElementById(`view-${view}`);
+    if (panel) panel.classList.remove('hidden');
     
-    main.innerHTML = `
-        <div class="thread-header">Sticky: OFFICIAL LEADERBOARD</div>
-        <div class="vb-btn" style="margin-bottom:10px;" onclick="loadIndex()">&lt; Back to Index</div>
-        
-        <table class="post-container">
-            <tr>
-                <td class="post-meta">
-                    <div style="font-size:14px; font-weight:bold; color:red;">System_Bot</div>
-                    <div class="tiny">Automated Referee</div>
-                </td>
-                <td class="post-content">
-                    <h1>The 1.74Gbps Gauntlet</h1>
-                    <p>Current verifiable throughput records.</p>
-                    <table class="lb-table">
-                        <tr>
-                            <th>Rank</th><th>Pilot</th><th>Throughput</th><th>Latency</th>
-                        </tr>
-                        <tr style="color:#ffd700">
-                            <td>0</td><td>[UNCLAIMED BOUNTY]</td><td>---</td><td>---</td>
-                        </tr>
-                        <tr>
-                            <td>1</td><td>dreamswag</td><td>500 Mbps</td><td>+0ms</td>
-                        </tr>
-                        <tr>
-                            <td>2</td><td>net_runner</td><td>480 Mbps</td><td>+1ms</td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-    `;
-}
-
-function viewCommunity() {
-    document.getElementById('nav-trail').innerText = `Ci5 Network > Forums > Community > General`;
-    const main = document.getElementById('main-content');
-    
-    let html = `
-        <div class="cat-header">General Discussion</div>
-        <div class="vb-btn" style="margin-bottom:10px;" onclick="loadIndex()">&lt; Back to Index</div>
-        <table width="100%" cellpadding="0" cellspacing="1" class="forum-table">
-            <tr class="thead-row">
-                <th width="5%">&nbsp;</th>
-                <th width="55%">Thread / Thread Starter</th>
-                <th width="15%">Last Post</th>
-                <th width="10%">Replies</th>
-                <th width="10%">Views</th>
-            </tr>
-    `;
-    
-    CHATS.forEach(chat => {
-        html += `
-            <tr class="forum-row row-a">
-                <td align="center">✉️</td>
-                <td>
-                    <div style="font-weight:bold; font-size:12px;"><a href="#" onclick="alert('Login to view thread')">${chat.title}</a></div>
-                    <div class="tiny">${chat.user}</div>
-                </td>
-                <td class="tiny">${chat.last}</td>
-                <td align="center">${chat.replies}</td>
-                <td align="center">${chat.views}</td>
-            </tr>
-        `;
+    document.querySelectorAll('.nav-link').forEach(l => {
+        l.classList.toggle('active', l.dataset.view === view);
     });
     
-    html += `</table>`;
-    main.innerHTML = html;
+    updateBreadcrumb(view);
+    state.currentView = view;
+    
+    if (view === 'leaderboard') loadLeaderboard();
+    if (view === 'blacklist') loadBlacklist();
+    if (view === 'submit') updateSubmitForm();
 }
 
-// --- UTIL ---
-function parseMarkdown(text) {
+function updateBreadcrumb(view) {
+    const crumbs = {
+        'index': 'ci5.network › Forums › Index',
+        'leaderboard': 'ci5.network › Forums › Leaderboard',
+        'submit': 'ci5.network › Forums › Submit RRUL',
+        'blacklist': 'ci5.network › Forums › Hall of .shAME',
+        'category': `ci5.network › Forums › ${state.currentCategory?.title || 'Category'}`,
+        'thread': `ci5.network › Forums › Thread`
+    };
+    document.getElementById('nav-trail').textContent = crumbs[view] || crumbs['index'];
+}
+
+// ===== REPO FILTERING =====
+function filterByRepo(repo) {
+    state.currentRepo = repo;
+    document.querySelectorAll('.forum-table[data-repos]').forEach(table => {
+        const repos = table.dataset.repos.split(',');
+        if (repo === 'all' || repos.includes(repo)) {
+            table.classList.remove('hidden-by-filter');
+        } else {
+            table.classList.add('hidden-by-filter');
+        }
+    });
+}
+
+function toggleCategory(btn) {
+    const body = btn.closest('.cat-header').nextElementSibling;
+    if (body.classList.contains('collapsed')) {
+        body.classList.remove('collapsed');
+        btn.textContent = '[−]';
+    } else {
+        body.classList.add('collapsed');
+        btn.textContent = '[+]';
+    }
+}
+
+// ===== AUTH =====
+function checkAuth() {
+    if (state.accessToken) {
+        fetchUserInfo();
+    }
+    updateAuthUI();
+}
+
+async function fetchUserInfo() {
+    try {
+        const res = await fetch('https://api.github.com/user', {
+            headers: { 'Authorization': `Bearer ${state.accessToken}` }
+        });
+        if (res.ok) {
+            state.user = await res.json();
+            updateAuthUI();
+        } else {
+            logout();
+        }
+    } catch (e) {
+        console.error('Auth check failed:', e);
+    }
+}
+
+function updateAuthUI() {
+    const guest = document.getElementById('welcome-guest');
+    const user = document.getElementById('welcome-user');
+    const submitAuth = document.getElementById('submit-auth-required');
+    const submitForm = document.getElementById('submit-form-fields');
+    const replyBox = document.getElementById('reply-box');
+    
+    if (state.user) {
+        guest.classList.add('hidden');
+        user.classList.remove('hidden');
+        document.getElementById('user-avatar').src = state.user.avatar_url;
+        document.getElementById('user-name').textContent = state.user.login;
+        if (submitAuth) submitAuth.classList.add('hidden');
+        if (submitForm) submitForm.classList.remove('hidden');
+        if (replyBox) replyBox.classList.remove('hidden');
+    } else {
+        guest.classList.remove('hidden');
+        user.classList.add('hidden');
+        if (submitAuth) submitAuth.classList.remove('hidden');
+        if (submitForm) submitForm.classList.add('hidden');
+        if (replyBox) replyBox.classList.add('hidden');
+    }
+}
+
+function updateSubmitForm() {
+    updateAuthUI();
+}
+
+// ===== DEVICE FLOW AUTH =====
+async function startDeviceAuth() {
+    const modal = document.getElementById('device-modal');
+    const loading = document.getElementById('device-loading');
+    const codeSection = document.getElementById('device-code-section');
+    
+    modal.classList.remove('hidden');
+    loading.classList.remove('hidden');
+    codeSection.classList.add('hidden');
+    
+    try {
+        const res = await fetch(CONFIG.api.deviceCode, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ client_id: CONFIG.clientId })
+        });
+        
+        if (!res.ok) throw new Error('Failed to get device code');
+        
+        const data = await res.json();
+        
+        loading.classList.add('hidden');
+        codeSection.classList.remove('hidden');
+        document.getElementById('user-code').textContent = data.user_code;
+        
+        pollForToken(data.device_code, data.interval || 5);
+    } catch (e) {
+        console.error('Device auth failed:', e);
+        alert('Authentication failed. Please try again.');
+        closeDeviceModal();
+    }
+}
+
+async function pollForToken(deviceCode, interval) {
+    state.deviceFlowInterval = setInterval(async () => {
+        try {
+            const res = await fetch(CONFIG.api.pollToken, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    client_id: CONFIG.clientId,
+                    device_code: deviceCode,
+                    grant_type: 'urn:ietf:params:oauth:grant-type:device_code'
+                })
+            });
+            
+            const data = await res.json();
+            
+            if (data.access_token) {
+                clearInterval(state.deviceFlowInterval);
+                state.accessToken = data.access_token;
+                localStorage.setItem('gh_token', data.access_token);
+                closeDeviceModal();
+                fetchUserInfo();
+            } else if (data.error === 'slow_down') {
+                clearInterval(state.deviceFlowInterval);
+                pollForToken(deviceCode, interval + 5);
+            }
+        } catch (e) {
+            console.error('Token poll error:', e);
+        }
+    }, interval * 1000);
+}
+
+function closeDeviceModal() {
+    document.getElementById('device-modal').classList.add('hidden');
+    if (state.deviceFlowInterval) {
+        clearInterval(state.deviceFlowInterval);
+        state.deviceFlowInterval = null;
+    }
+}
+
+function logout() {
+    state.user = null;
+    state.accessToken = null;
+    localStorage.removeItem('gh_token');
+    updateAuthUI();
+}
+
+// ===== DATA LOADING =====
+async function loadForumData() {
+    loadActivityFeed();
+    loadCategoryStats();
+}
+
+async function loadActivityFeed() {
+    const list = document.getElementById('activity-list');
+    
+    try {
+        const activities = [];
+        
+        for (const repo of CONFIG.repos) {
+            try {
+                const discussions = await fetchRecentDiscussions(repo.owner, repo.repo, 3);
+                activities.push(...discussions.map(d => ({ ...d, repoLabel: repo.label })));
+            } catch (e) {
+                console.warn(`Failed to load ${repo.label}:`, e);
+            }
+        }
+        
+        activities.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        if (activities.length === 0) {
+            list.innerHTML = '<div class="loading-row">No recent activity</div>';
+        } else {
+            list.innerHTML = activities.slice(0, 10).map(a => `
+                <div class="activity-item">
+                    <span class="activity-icon">💬</span>
+                    <div class="activity-content">
+                        <a href="#" class="activity-title" onclick="viewThread('${a.id}'); return false;">${esc(a.title)}</a>
+                        <div class="activity-meta">
+                            by ${esc(a.author?.login || 'unknown')} in ${a.repoLabel} · ${timeAgo(a.createdAt)}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+    } catch (e) {
+        console.error('Activity load failed:', e);
+        list.innerHTML = '<div class="loading-row">Failed to load activity</div>';
+    }
+}
+
+async function fetchRecentDiscussions(owner, repo, limit = 10) {
+    const query = `query {
+        repository(owner: "${owner}", name: "${repo}") {
+            discussions(first: ${limit}, orderBy: {field: CREATED_AT, direction: DESC}) {
+                nodes { id title createdAt author { login avatarUrl } category { name } comments { totalCount } }
+            }
+        }
+    }`;
+    
+    const res = await fetch('https://api.github.com/graphql', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...(state.accessToken ? { 'Authorization': `Bearer ${state.accessToken}` } : {})
+        },
+        body: JSON.stringify({ query })
+    });
+    
+    const data = await res.json();
+    return data.data?.repository?.discussions?.nodes || [];
+}
+
+async function loadCategoryStats() {
+    for (const [id, cfg] of Object.entries(CONFIG.categories)) {
+        try {
+            const repo = CONFIG.repos.find(r => r.label === cfg.repo);
+            if (!repo) continue;
+            
+            const stats = await fetchCategoryStats(repo.owner, repo.repo, cfg.ghCategory);
+            
+            const threads = document.getElementById(`${id}-threads`);
+            const posts = document.getElementById(`${id}-posts`);
+            const last = document.getElementById(`${id}-last`);
+            
+            if (threads) threads.textContent = stats.threadCount;
+            if (posts) posts.textContent = stats.postCount;
+            if (last && stats.lastPost) {
+                last.innerHTML = `by ${esc(stats.lastPost.author)}<br>${timeAgo(stats.lastPost.date)}`;
+            }
+        } catch (e) {
+            console.warn(`Stats failed for ${id}:`, e);
+        }
+    }
+}
+
+async function fetchCategoryStats(owner, repo, categoryName) {
+    const query = `query {
+        repository(owner: "${owner}", name: "${repo}") {
+            discussions(first: 100) {
+                totalCount
+                nodes { category { name } comments { totalCount } createdAt author { login } }
+            }
+        }
+    }`;
+    
+    try {
+        const res = await fetch('https://api.github.com/graphql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(state.accessToken ? { 'Authorization': `Bearer ${state.accessToken}` } : {})
+            },
+            body: JSON.stringify({ query })
+        });
+        
+        const data = await res.json();
+        const all = data.data?.repository?.discussions?.nodes || [];
+        const filtered = all.filter(d => d.category?.name?.toLowerCase() === categoryName?.toLowerCase());
+        
+        return {
+            threadCount: filtered.length,
+            postCount: filtered.reduce((sum, d) => sum + (d.comments?.totalCount || 0) + 1, 0),
+            lastPost: filtered[0] ? { author: filtered[0].author?.login || 'unknown', date: filtered[0].createdAt } : null
+        };
+    } catch (e) {
+        return { threadCount: '—', postCount: '—', lastPost: null };
+    }
+}
+
+// ===== CATEGORY & THREAD VIEWS =====
+async function viewCategory(categoryId) {
+    const cfg = CONFIG.categories[categoryId];
+    if (!cfg) return;
+    
+    state.currentCategory = { id: categoryId, ...cfg };
+    document.getElementById('category-title').textContent = cfg.title;
+    document.getElementById('category-header').textContent = cfg.title;
+    
+    switchView('category');
+    
+    const list = document.getElementById('thread-list');
+    list.innerHTML = '<tr><td colspan="4" class="loading-row">Loading threads...</td></tr>';
+    
+    try {
+        const repo = CONFIG.repos.find(r => r.label === cfg.repo);
+        if (!repo) throw new Error('Repo not found');
+        
+        const discussions = await fetchDiscussionsByCategory(repo.owner, repo.repo, cfg.ghCategory);
+        
+        if (discussions.length === 0) {
+            list.innerHTML = '<tr><td colspan="4" class="loading-row">No threads in this category</td></tr>';
+        } else {
+            list.innerHTML = discussions.map(d => `
+                <tr class="forum-row alt-a">
+                    <td align="center"><div class="f-icon">📝</div></td>
+                    <td>
+                        <div class="forum-title"><a href="#" onclick="viewThread('${d.id}'); return false;">${esc(d.title)}</a></div>
+                        <div class="forum-desc">by ${esc(d.author?.login || 'unknown')} · ${timeAgo(d.createdAt)}</div>
+                    </td>
+                    <td class="last-post">${timeAgo(d.createdAt)}</td>
+                    <td align="center">${d.comments?.totalCount || 0}</td>
+                </tr>
+            `).join('');
+        }
+    } catch (e) {
+        console.error('Category load failed:', e);
+        list.innerHTML = '<tr><td colspan="4" class="loading-row">Failed to load threads</td></tr>';
+    }
+}
+
+async function fetchDiscussionsByCategory(owner, repo, categoryName) {
+    const query = `query {
+        repository(owner: "${owner}", name: "${repo}") {
+            discussions(first: 50, orderBy: {field: CREATED_AT, direction: DESC}) {
+                nodes { id title body createdAt author { login avatarUrl } category { name } comments(first: 1) { totalCount } }
+            }
+        }
+    }`;
+    
+    const res = await fetch('https://api.github.com/graphql', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...(state.accessToken ? { 'Authorization': `Bearer ${state.accessToken}` } : {})
+        },
+        body: JSON.stringify({ query })
+    });
+    
+    const data = await res.json();
+    return (data.data?.repository?.discussions?.nodes || []).filter(d => 
+        d.category?.name?.toLowerCase() === categoryName?.toLowerCase()
+    );
+}
+
+async function viewThread(discussionId) {
+    state.currentThread = discussionId;
+    switchView('thread');
+    
+    const postList = document.getElementById('post-list');
+    postList.innerHTML = '<div class="loading-row">Loading thread...</div>';
+    
+    try {
+        const discussion = await fetchDiscussion(discussionId);
+        
+        if (!discussion) {
+            postList.innerHTML = '<div class="loading-row">Thread not found</div>';
+            return;
+        }
+        
+        document.getElementById('thread-title-bar').textContent = discussion.title;
+        
+        let html = renderPost(discussion, true);
+        if (discussion.comments?.nodes) {
+            html += discussion.comments.nodes.map(c => renderPost(c, false)).join('');
+        }
+        
+        postList.innerHTML = html;
+        updateAuthUI();
+    } catch (e) {
+        console.error('Thread load failed:', e);
+        postList.innerHTML = '<div class="loading-row">Failed to load thread</div>';
+    }
+}
+
+async function fetchDiscussion(discussionId) {
+    const query = `query {
+        node(id: "${discussionId}") {
+            ... on Discussion {
+                id title body createdAt author { login avatarUrl }
+                comments(first: 100) { nodes { id body createdAt author { login avatarUrl } } }
+            }
+        }
+    }`;
+    
+    const res = await fetch('https://api.github.com/graphql', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...(state.accessToken ? { 'Authorization': `Bearer ${state.accessToken}` } : {})
+        },
+        body: JSON.stringify({ query })
+    });
+    
+    const data = await res.json();
+    return data.data?.node;
+}
+
+function renderPost(post, isOP) {
+    const avatar = post.author?.avatarUrl || 'https://github.com/ghost.png';
+    const username = post.author?.login || 'unknown';
+    
+    return `
+        <div class="post-container">
+            <div class="post-header">
+                <span>${timeAgo(post.createdAt)}</span>
+                <span>#${isOP ? '1' : ''}</span>
+            </div>
+            <div class="post-body">
+                <div class="post-meta">
+                    <img src="${avatar}" class="post-avatar">
+                    <div class="post-username">${esc(username)}</div>
+                    <div class="post-usertitle">${isOP ? 'Thread Starter' : 'Member'}</div>
+                </div>
+                <div class="post-content">${renderMarkdown(post.body || '')}</div>
+            </div>
+        </div>
+    `;
+}
+
+function backToCategory() {
+    if (state.currentCategory) {
+        viewCategory(state.currentCategory.id);
+    } else {
+        switchView('index');
+    }
+}
+
+// ===== LEADERBOARD =====
+async function loadLeaderboard() {
+    const topBody = document.getElementById('lb-top-body');
+    const recentBody = document.getElementById('lb-recent-body');
+    
+    try {
+        const res = await fetch(CONFIG.api.leaderboard);
+        if (res.ok) {
+            const data = await res.json();
+            
+            if (data.top?.length > 0) {
+                topBody.innerHTML = data.top.map((e, i) => `
+                    <tr class="forum-row alt-a">
+                        <td><span class="rank-medal">${getRankMedal(i + 1)}</span></td>
+                        <td><a href="https://github.com/${e.github}" target="_blank">${esc(e.github)}</a></td>
+                        <td><span class="speed-value">${e.throughput}</span> Mbps</td>
+                        <td>+${e.latency}ms</td>
+                        <td>${esc(e.hardware)}</td>
+                        <td>${formatDate(e.date)}</td>
+                    </tr>
+                `).join('');
+            }
+            
+            if (data.recent?.length > 0) {
+                recentBody.innerHTML = data.recent.map(e => `
+                    <tr class="forum-row alt-a">
+                        <td><a href="https://github.com/${e.github}" target="_blank">${esc(e.github)}</a></td>
+                        <td><span class="speed-value">${e.download}</span> Mbps</td>
+                        <td><span class="speed-value">${e.upload}</span> Mbps</td>
+                        <td>${e.latency} ms</td>
+                        <td>${esc(e.cork)}</td>
+                        <td>${timeAgo(e.submitted)}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+    } catch (e) {
+        console.warn('Leaderboard unavailable');
+        recentBody.innerHTML = '<tr><td colspan="6" class="loading-row">Leaderboard unavailable</td></tr>';
+    }
+}
+
+function getRankMedal(rank) {
+    return rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+}
+
+// ===== BLACKLIST =====
+async function loadBlacklist() {
+    const corksBody = document.getElementById('bl-corks-body');
+    const hwidBody = document.getElementById('bl-hwid-body');
+    
+    try {
+        const res = await fetch(CONFIG.api.blacklist);
+        if (res.ok) {
+            const data = await res.json();
+            
+            if (data.corks?.length > 0) {
+                corksBody.innerHTML = data.corks.map(c => `
+                    <tr>
+                        <td>${esc(c.id)}</td>
+                        <td><span class="reason-badge reason-${c.reasonType}">${c.reasonType.toUpperCase()}</span></td>
+                        <td>${c.cve || 'N/A'}</td>
+                        <td class="severity-${c.severity.toLowerCase()}">${c.severity}</td>
+                        <td>${formatDate(c.blockedSince)}</td>
+                    </tr>
+                `).join('');
+            } else {
+                corksBody.innerHTML = '<tr><td colspan="5" class="loading-row">No compromised corks</td></tr>';
+            }
+            
+            if (data.hwids?.length > 0) {
+                hwidBody.innerHTML = data.hwids.map(h => `
+                    <tr>
+                        <td>${esc(h.partial)}</td>
+                        <td><span class="reason-badge reason-abuse">${h.reasonType.toUpperCase()}</span> ${esc(h.reason)}</td>
+                        <td>${formatDate(h.bannedSince)}</td>
+                        <td class="${h.appeal === 'Denied' ? 'severity-critical' : ''}">${h.appeal}</td>
+                    </tr>
+                `).join('');
+            } else {
+                hwidBody.innerHTML = '<tr><td colspan="4" class="loading-row">No blacklisted HWIDs</td></tr>';
+            }
+        }
+    } catch (e) {
+        console.warn('Blacklist unavailable');
+        corksBody.innerHTML = '<tr><td colspan="5" class="loading-row">Blacklist unavailable</td></tr>';
+        hwidBody.innerHTML = '<tr><td colspan="4" class="loading-row">Blacklist unavailable</td></tr>';
+    }
+}
+
+// ===== RRUL SUBMISSION =====
+async function submitRRUL() {
+    if (!state.user) {
+        startDeviceAuth();
+        return;
+    }
+    
+    const jsonInput = document.getElementById('rrul-json').value;
+    const cork = document.getElementById('cork-select').value;
+    const hardware = document.getElementById('hardware-input').value;
+    const notes = document.getElementById('notes-input').value;
+    
+    let rrul;
+    try {
+        rrul = JSON.parse(jsonInput);
+        if (!rrul.download || !rrul.upload) throw new Error('Missing fields');
+    } catch (e) {
+        alert('Invalid RRUL JSON. Please paste valid flent output.');
+        return;
+    }
+    
+    if (!cork) { alert('Please select a Cork.'); return; }
+    if (!hardware) { alert('Please enter your hardware.'); return; }
+    
+    try {
+        const res = await fetch(CONFIG.api.submit, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${state.accessToken}`
+            },
+            body: JSON.stringify({ rrul, cork, hardware, notes, github: state.user.login })
+        });
+        
+        if (res.ok) {
+            alert('RRUL results submitted successfully!');
+            document.getElementById('rrul-json').value = '';
+            document.getElementById('notes-input').value = '';
+            loadLeaderboard();
+        } else {
+            const err = await res.json();
+            alert(`Submission failed: ${err.message || 'Unknown error'}`);
+        }
+    } catch (e) {
+        console.error('Submit failed:', e);
+        alert('Submission failed. Please try again.');
+    }
+}
+
+function previewRRUL() {
+    const jsonInput = document.getElementById('rrul-json').value;
+    try {
+        const rrul = JSON.parse(jsonInput);
+        alert(`Preview:\n\nDownload: ${rrul.download} Mbps\nUpload: ${rrul.upload} Mbps\nLatency: ${rrul.latency_idle || 'N/A'} ms`);
+    } catch (e) {
+        alert('Invalid JSON format');
+    }
+}
+
+// ===== REPLY =====
+async function postReply() {
+    if (!state.user || !state.currentThread) return;
+    
+    const text = document.getElementById('reply-text').value.trim();
+    if (!text) { alert('Please enter a reply.'); return; }
+    
+    try {
+        const mutation = `mutation {
+            addDiscussionComment(input: {
+                discussionId: "${state.currentThread}",
+                body: "${text.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"
+            }) { comment { id } }
+        }`;
+        
+        const res = await fetch('https://api.github.com/graphql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${state.accessToken}`
+            },
+            body: JSON.stringify({ query: mutation })
+        });
+        
+        const data = await res.json();
+        if (data.errors) throw new Error(data.errors[0].message);
+        
+        document.getElementById('reply-text').value = '';
+        viewThread(state.currentThread);
+    } catch (e) {
+        console.error('Reply failed:', e);
+        alert(`Failed to post reply: ${e.message}`);
+    }
+}
+
+// ===== SEARCH =====
+function doSearch() {
+    const query = document.getElementById('search-input').value.trim();
+    if (!query) return;
+    window.open(`https://github.com/search?q=org%3Adreamswag+${encodeURIComponent(query)}&type=discussions`, '_blank');
+}
+
+// ===== UTILITIES =====
+function esc(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function renderMarkdown(text) {
     return text
-        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-        .replace(/\*\*(.*)\*\*/gim, '<b>$1</b>')
-        .replace(/> (.*$)/gim, '<blockquote>$1</blockquote>')
-        .replace(/\n/gim, '<br>');
+        .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre>$2</pre>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+        .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+        .replace(/\n/g, '<br>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
 }
 
-// --- AUTH ---
-function openAuth() { document.getElementById('auth-modal').classList.remove('hidden'); }
-function closeAuth() { document.getElementById('auth-modal').classList.add('hidden'); }
-function mockLogin() {
-    closeAuth();
-    document.querySelector('.welcome-text').innerHTML = `<strong>Welcome back, dreamswag_fan.</strong><br>You last visited: Today at 14:02.`;
-    document.querySelector('.login-inputs').innerHTML = `<button class="vb-btn" onclick="location.reload()">Log Out</button>`;
+function timeAgo(dateString) {
+    const seconds = Math.floor((new Date() - new Date(dateString)) / 1000);
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)} min ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
+    return formatDate(dateString);
 }
 
-// INIT
-document.addEventListener('DOMContentLoaded', loadIndex);
+function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        e.preventDefault();
+        document.getElementById('search-input').focus();
+    }
+    if (e.key === 'Escape') closeDeviceModal();
+});

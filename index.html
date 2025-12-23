@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ci5 Sovereign Network - Powered by vBulletin</title>
+    <title>ci5.network Community Forums</title>
     <link rel="stylesheet" href="static/style.css">
     <link rel="icon" type="image/png" href="https://ci5.run/static/signal.png">
-    <link href="https://fonts.googleapis.com/css2?family=Verdana:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -14,77 +13,459 @@
         <div class="logo-area">
             <img src="https://ci5.run/static/signal.png" class="vb-logo" alt="Ci5">
             <div class="logo-text">
-                <div class="brand">Ci5 Network</div>
-                <div class="slogan">Sovereign Infrastructure & Community</div>
+                <div class="brand">ci5<span class="brand-tld">.network</span></div>
+                <div class="slogan">Community Forums</div>
             </div>
         </div>
-        <div class="top-banner">
-            <div class="banner-box">
-                <span class="green">>> SYSTEM STATUS:</span> OPTIMAL<br>
-                <span class="cyan">>> NODES ONLINE:</span> 12,847
-            </div>
+        <div class="header-links">
+            <a href="https://ci5.run" class="header-link">run</a>
+            <a href="https://ci5.host" class="header-link">host</a>
+            <a href="https://ci5.dev" class="header-link">dev</a>
         </div>
     </div>
 
     <div class="vb-navbar">
         <div class="nav-links">
-            <a href="#" onclick="loadIndex()">User CP</a>
-            <a href="#" onclick="loadIndex()">FAQ</a>
-            <a href="#" onclick="loadIndex()">Members List</a>
-            <a href="#" onclick="loadIndex()">Calendar</a>
-            <a href="#" onclick="loadIndex()">New Posts</a>
-            <a href="#" onclick="loadIndex()">Search</a>
+            <a href="#" class="nav-link active" data-view="index">Forums</a>
+            <a href="#" class="nav-link" data-view="leaderboard">Leaderboard</a>
+            <a href="#" class="nav-link" data-view="submit">Submit RRUL</a>
+            <a href="#" class="nav-link" data-view="blacklist">Blacklist</a>
+        </div>
+        <div class="search-area">
+            <input type="text" class="search-input" placeholder="Search..." id="search-input">
+            <button class="vb-btn" onclick="doSearch()">Go</button>
         </div>
     </div>
 
     <div class="vb-body">
         <div class="breadcrumb">
             <span class="crumb-icon">🏠</span> 
-            <span id="nav-trail">Ci5 Network > Forums > Index</span>
+            <span id="nav-trail">ci5.network › Forums › Index</span>
         </div>
 
-        <div class="welcome-panel" id="guest-panel">
-            <div class="welcome-text">
-                <strong>Welcome, Guest.</strong><br>
-                Please <a href="#" onclick="openAuth()">login with GitHub</a> to post replies.
-            </div>
-            <div class="login-inputs">
-                <button class="vb-btn" onclick="openAuth()">GitHub Connect</button>
-            </div>
-        </div>
-
-        <div id="main-content">
-            </div>
-
-        <div class="forum-stats">
-            <div class="cat-header">What's Going On?</div>
-            <div class="stat-row">
-                <div class="stat-icon">👥</div>
-                <div class="stat-text">
-                    Currently Active Users: <strong>412</strong> (12 members and 400 guests)<br>
-                    <span class="tiny">Most users ever online was 12,847, Today at 14:02.</span><br>
-                    <span class="user-link admin">dreamswag</span>, <span class="user-link mod">net_runner</span>, <span class="user-link">anon_user</span>
+        <div class="welcome-panel" id="welcome-panel">
+            <div class="welcome-guest" id="welcome-guest">
+                <div class="welcome-text">
+                    <strong>Welcome, Guest.</strong><br>
+                    <a href="#" onclick="startDeviceAuth(); return false;">Login via GitHub</a> to participate.
+                </div>
+                <div class="login-area">
+                    <button class="vb-btn primary" onclick="startDeviceAuth()">GitHub Login</button>
                 </div>
             </div>
+            <div class="welcome-user hidden" id="welcome-user">
+                <img src="" alt="" class="user-avatar" id="user-avatar">
+                <div class="welcome-text">
+                    Welcome back, <strong id="user-name"></strong>.<br>
+                    <a href="#" onclick="logout(); return false;">Log Out</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Device Auth Modal -->
+        <div class="overlay hidden" id="device-modal">
+            <div class="vb-modal">
+                <div class="cat-header">GitHub Device Authorization</div>
+                <div class="modal-body">
+                    <div id="device-loading">
+                        <p>Requesting device code...</p>
+                    </div>
+                    <div id="device-code-section" class="hidden">
+                        <p>Enter this code at <a href="https://github.com/login/device" target="_blank" class="highlight">github.com/login/device</a></p>
+                        <div class="code-display" id="user-code">XXXX-XXXX</div>
+                        <p class="tiny">Waiting for authorization...</p>
+                    </div>
+                </div>
+                <div class="modal-btns">
+                    <button class="vb-btn" onclick="closeDeviceModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="main-content">
+
+            <!-- ===== INDEX VIEW ===== -->
+            <div class="view-panel" id="view-index">
+
+                <!-- Repo Tabs -->
+                <div class="repo-tabs">
+                    <a href="#" class="repo-tab active" data-repo="all">cAll5</a>
+                    <a href="#" class="repo-tab" data-repo="ci5">ci5</a>
+                    <a href="#" class="repo-tab" data-repo="ci5.network">.network</a>
+                    <a href="#" class="repo-tab" data-repo="ci5.host">.host</a>
+                    <a href="#" class="repo-tab" data-repo="ci5.dev">.dev</a>   
+                </div>
+
+                <!-- Performance Arena -->
+                <div class="forum-table" data-repos="ci5.network">
+                    <div class="cat-header gold">
+                        <span class="collapse-btn" onclick="toggleCategory(this)">[−]</span>
+                        🏆 St. Guinea CiG | Performance Arena
+                    </div>
+                    <div class="cat-body">
+                        <table width="100%" cellpadding="0" cellspacing="1">
+                            <tr class="thead-row">
+                                <th width="5%"></th>
+                                <th width="50%">Forum</th>
+                                <th width="10%">Threads</th>
+                                <th width="10%">Posts</th>
+                                <th width="25%">Last Post</th>
+                            </tr>
+                            <tr class="forum-row alt-a" data-category="metrics">
+                                <td align="center"><div class="f-icon new">📊</div></td>
+                                <td>
+                                    <div class="forum-title"><a href="#" onclick="viewCategory('metrics'); return false;">RRUL Submissions</a></div>
+                                    <div class="forum-desc">Post your Realtime Response Under Load results. Auto-indexed to leaderboard.</div>
+                                </td>
+                                <td align="center" id="metrics-threads">—</td>
+                                <td align="center" id="metrics-posts">—</td>
+                                <td class="last-post" id="metrics-last">Loading...</td>
+                            </tr>
+                            <tr class="forum-row alt-b">
+                                <td align="center"><div class="f-icon gold">👑</div></td>
+                                <td>
+                                    <div class="forum-title"><a href="#" onclick="switchView('leaderboard'); return false;">Holy CiG5 🤯 Hall of Fame</a></div>
+                                    <div class="forum-desc">The elite. Verified 1.74Gbps+ entries only.</div>
+                                </td>
+                                <td align="center">0</td>
+                                <td align="center">0</td>
+                                <td class="last-post"><span class="dim">Awaiting first champion...</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Documentation -->
+                <div class="forum-table" data-repos="ci5.network,ci5">
+                    <div class="cat-header">
+                        <span class="collapse-btn" onclick="toggleCategory(this)">[−]</span>
+                        📚 Documentation & Announcements
+                    </div>
+                    <div class="cat-body">
+                        <table width="100%" cellpadding="0" cellspacing="1">
+                            <tr class="thead-row">
+                                <th width="5%"></th>
+                                <th width="50%">Forum</th>
+                                <th width="10%">Threads</th>
+                                <th width="10%">Posts</th>
+                                <th width="25%">Last Post</th>
+                            </tr>
+                            <tr class="forum-row alt-a" data-category="announcements">
+                                <td align="center"><div class="f-icon">📢</div></td>
+                                <td>
+                                    <div class="forum-title"><a href="#" onclick="viewCategory('announcements'); return false;">Announcements</a></div>
+                                    <div class="forum-desc">Official project updates and releases.</div>
+                                </td>
+                                <td align="center" id="announcements-threads">—</td>
+                                <td align="center" id="announcements-posts">—</td>
+                                <td class="last-post" id="announcements-last">Loading...</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Community -->
+                <div class="forum-table" data-repos="ci5.network,ci5,ci5.host,ci5.dev">
+                    <div class="cat-header">
+                        <span class="collapse-btn" onclick="toggleCategory(this)">[−]</span>
+                        💬 Community Discussion
+                    </div>
+                    <div class="cat-body">
+                        <table width="100%" cellpadding="0" cellspacing="1">
+                            <tr class="thead-row">
+                                <th width="5%"></th>
+                                <th width="50%">Forum</th>
+                                <th width="10%">Threads</th>
+                                <th width="10%">Posts</th>
+                                <th width="25%">Last Post</th>
+                            </tr>
+                            <tr class="forum-row alt-a" data-category="intel_req">
+                                <td align="center"><div class="f-icon">🚨</div></td>
+                                <td>
+                                    <div class="forum-title"><a href="#" onclick="viewCategory('intel_req'); return false;">INTEL_REQ</a></div>
+                                    <div class="forum-desc">Unsolved queries, malfunctions, troubleshooting. Include bone_marrow.sh output.</div>
+                                </td>
+                                <td align="center" id="intel_req-threads">—</td>
+                                <td align="center" id="intel_req-posts">—</td>
+                                <td class="last-post" id="intel_req-last">Loading...</td>
+                            </tr>
+                            <tr class="forum-row alt-b" data-category="armory">
+                                <td align="center"><div class="f-icon">🛠️</div></td>
+                                <td>
+                                    <div class="forum-title"><a href="#" onclick="viewCategory('armory'); return false;">ARMORY</a></div>
+                                    <div class="forum-desc">Hardware showcase. Custom enclosures, cooling mods, HAT implementations.</div>
+                                </td>
+                                <td align="center" id="armory-threads">—</td>
+                                <td align="center" id="armory-posts">—</td>
+                                <td class="last-post" id="armory-last">Loading...</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Cork Development -->
+                <div class="forum-table" data-repos="ci5.dev">
+                    <div class="cat-header">
+                        <span class="collapse-btn" onclick="toggleCategory(this)">[−]</span>
+                        📦 Cork Development
+                    </div>
+                    <div class="cat-body">
+                        <table width="100%" cellpadding="0" cellspacing="1">
+                            <tr class="thead-row">
+                                <th width="5%"></th>
+                                <th width="50%">Forum</th>
+                                <th width="10%">Threads</th>
+                                <th width="10%">Posts</th>
+                                <th width="25%">Last Post</th>
+                            </tr>
+                            <tr class="forum-row alt-a" data-category="cork-submissions">
+                                <td align="center"><div class="f-icon new">🧪</div></td>
+                                <td>
+                                    <div class="forum-title"><a href="#" onclick="viewCategory('cork-submissions'); return false;">Cork Submissions</a></div>
+                                    <div class="forum-desc">Submit containers for Winery processing. Community review pipeline.</div>
+                                </td>
+                                <td align="center" id="cork-submissions-threads">—</td>
+                                <td align="center" id="cork-submissions-posts">—</td>
+                                <td class="last-post" id="cork-submissions-last">Loading...</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Hall of Shame -->
+                <div class="forum-table" data-repos="ci5.network">
+                    <div class="cat-header shame">
+                        <span class="collapse-btn" onclick="toggleCategory(this)">[−]</span>
+                        🔔 HALL_OF.shAME
+                    </div>
+                    <div class="cat-body">
+                        <table width="100%" cellpadding="0" cellspacing="1">
+                            <tr class="thead-row">
+                                <th width="5%"></th>
+                                <th width="50%">Forum</th>
+                                <th width="10%">Entries</th>
+                                <th width="10%">Reports</th>
+                                <th width="25%">Last Entry</th>
+                            </tr>
+                            <tr class="forum-row alt-a">
+                                <td align="center"><div class="f-icon shame">🚫</div></td>
+                                <td>
+                                    <div class="forum-title"><a href="#" onclick="switchView('blacklist'); return false;">Compromised Corks & Blacklisted HWIDs</a></div>
+                                    <div class="forum-desc">Flagged for CVEs, malware, abuse. Auto-blocked by ci5.run bootstrap.</div>
+                                </td>
+                                <td align="center" id="blacklist-entries">—</td>
+                                <td align="center" id="blacklist-reports">—</td>
+                                <td class="last-post" id="blacklist-last">Loading...</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Latest Activity -->
+                <div class="forum-table">
+                    <div class="cat-header">Latest Activity</div>
+                    <div class="activity-list" id="activity-list">
+                        <div class="loading-row">Loading from GitHub Discussions...</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ===== LEADERBOARD VIEW ===== -->
+            <div class="view-panel hidden" id="view-leaderboard">
+                <div class="page-title">St. Guinea CiG — Performance Leaderboard</div>
+                <p class="page-desc">The 1.74Gbps Gauntlet. First verified submission claims eternal glory.</p>
+
+                <div class="forum-table">
+                    <div class="cat-header gold">🐹🪽 Holy CiG5 🤯 — Top Performers</div>
+                    <table class="data-table" width="100%">
+                        <tr class="thead-row">
+                            <th>Rank</th>
+                            <th>Pilot</th>
+                            <th>Throughput</th>
+                            <th>Latency</th>
+                            <th>Hardware</th>
+                            <th>Date</th>
+                        </tr>
+                        <tbody id="lb-top-body">
+                            <tr class="bounty-row">
+                                <td colspan="6">
+                                    <div class="bounty-text">⚡ 1.74Gbps BOUNTY UNCLAIMED ⚡</div>
+                                    <div class="bounty-sub">Be the first to break the barrier</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="forum-table">
+                    <div class="cat-header">📊 Recent Verified Submissions</div>
+                    <table class="data-table" width="100%">
+                        <tr class="thead-row">
+                            <th>Pilot</th>
+                            <th>Download</th>
+                            <th>Upload</th>
+                            <th>Latency</th>
+                            <th>Cork</th>
+                            <th>Submitted</th>
+                        </tr>
+                        <tbody id="lb-recent-body">
+                            <tr><td colspan="6" class="loading-row">Loading submissions...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="back-nav">
+                    <a href="#" onclick="switchView('index'); return false;">« Back to Forums</a>
+                </div>
+            </div>
+
+            <!-- ===== SUBMIT VIEW ===== -->
+            <div class="view-panel hidden" id="view-submit">
+                <div class="page-title">Submit RRUL Results</div>
+                <p class="page-desc">Upload your Realtime Response Under Load test for leaderboard indexing.</p>
+
+                <div class="forum-table">
+                    <div class="cat-header">Submission Form</div>
+                    <div class="form-body">
+                        <div class="auth-required" id="submit-auth-required">
+                            <p>You must be logged in to submit results.</p>
+                            <button class="vb-btn primary" onclick="startDeviceAuth()">Login via GitHub</button>
+                        </div>
+
+                        <div class="form-fields hidden" id="submit-form-fields">
+                            <div class="form-group">
+                                <label>RRUL JSON Output:</label>
+                                <textarea id="rrul-json" placeholder='Paste flent RRUL JSON output...'></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>Cork Used:</label>
+                                    <select id="cork-select">
+                                        <option value="">Select Cork...</option>
+                                        <option value="cake-autorate">cake-autorate</option>
+                                        <option value="sqm-scripts">sqm-scripts</option>
+                                        <option value="custom">Custom (specify in notes)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group half">
+                                    <label>Hardware:</label>
+                                    <input type="text" id="hardware-input" placeholder="e.g., Pi5 8GB + RTL8153">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Notes (optional):</label>
+                                <textarea id="notes-input" rows="3" placeholder="ISP, line speed, any custom tuning..."></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button class="vb-btn primary" onclick="submitRRUL()">Submit Results</button>
+                                <button class="vb-btn" onclick="previewRRUL()">Preview</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="back-nav">
+                    <a href="#" onclick="switchView('index'); return false;">« Back to Forums</a>
+                </div>
+            </div>
+
+            <!-- ===== BLACKLIST VIEW ===== -->
+            <div class="view-panel hidden" id="view-blacklist">
+                <div class="page-title shame">⛔ Hall of .shAME</div>
+                <p class="page-desc">Compromised Corks and blacklisted Hardware IDs. Auto-blocked by ci5.run.</p>
+
+                <div class="forum-table">
+                    <div class="cat-header shame">Confirmed Compromised Corks</div>
+                    <table class="data-table" width="100%">
+                        <tr class="thead-row">
+                            <th>Cork ID</th>
+                            <th>Reason</th>
+                            <th>CVE</th>
+                            <th>Severity</th>
+                            <th>Blocked Since</th>
+                        </tr>
+                        <tbody id="bl-corks-body">
+                            <tr><td colspan="5" class="loading-row">Loading blacklist...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="forum-table">
+                    <div class="cat-header shame">Hardware-ID Blacklist</div>
+                    <table class="data-table" width="100%">
+                        <tr class="thead-row">
+                            <th>HWID (Partial)</th>
+                            <th>Reason</th>
+                            <th>Banned Since</th>
+                            <th>Appeal</th>
+                        </tr>
+                        <tbody id="bl-hwid-body">
+                            <tr><td colspan="4" class="loading-row">Loading blacklist...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="back-nav">
+                    <a href="#" onclick="switchView('index'); return false;">« Back to Forums</a>
+                </div>
+            </div>
+
+            <!-- ===== CATEGORY VIEW ===== -->
+            <div class="view-panel hidden" id="view-category">
+                <div class="page-title" id="category-title">Loading...</div>
+
+                <div class="forum-table">
+                    <div class="cat-header" id="category-header">Threads</div>
+                    <table class="data-table" width="100%">
+                        <tr class="thead-row">
+                            <th width="5%"></th>
+                            <th>Thread / Started By</th>
+                            <th width="15%">Last Post</th>
+                            <th width="8%">Replies</th>
+                        </tr>
+                        <tbody id="thread-list">
+                            <tr><td colspan="4" class="loading-row">Loading threads...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="back-nav">
+                    <a href="#" onclick="switchView('index'); return false;">« Back to Forums</a>
+                </div>
+            </div>
+
+            <!-- ===== THREAD VIEW ===== -->
+            <div class="view-panel hidden" id="view-thread">
+                <div class="thread-title-bar" id="thread-title-bar">Loading...</div>
+
+                <div id="post-list"></div>
+
+                <div class="reply-box hidden" id="reply-box">
+                    <div class="cat-header">Quick Reply</div>
+                    <div class="reply-form">
+                        <textarea id="reply-text" placeholder="Write your reply..."></textarea>
+                        <div class="reply-actions">
+                            <button class="vb-btn primary" onclick="postReply()">Post Reply</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="back-nav">
+                    <a href="#" onclick="backToCategory(); return false;">« Back to Category</a>
+                </div>
+            </div>
+
         </div>
 
         <div class="footer">
-            Powered by Ci5 Engine 7.4.1<br>
-            Copyright © 2025 Dreamswag Foundation.
-        </div>
-    </div>
-
-    <div class="overlay hidden" id="auth-modal">
-        <div class="vb-modal">
-            <div class="cat-header">vBulletin Message</div>
-            <div class="modal-body">
-                <p>You are about to log in via <strong>GitHub OAuth</strong>.</p>
-                <p>This will link your identity to your sovereign node.</p>
-                <div class="modal-btns">
-                    <button class="vb-btn" onclick="mockLogin()">Proceed</button>
-                    <button class="vb-btn alt" onclick="closeAuth()">Go Back</button>
-                </div>
-            </div>
+            <a href="https://github.com/dreamswag/ci5.network">GitHub</a> · 
+            <a href="/docs/SUPPORT.md">Support</a> · 
+            <a href="/docs/ARCHITECTURE.md">Docs</a>
+            <br>
+            USB3.0 NIC License<br>
+            <span class="tiny">🎪    N0 R19H75 D353RV3D. 🎪</span>
         </div>
     </div>
 
