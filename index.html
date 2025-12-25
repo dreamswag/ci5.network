@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ci5.network Community Forums</title>
     <link rel="stylesheet" href="static/style.css">
     <link rel="icon" type="image/png" href="https://ci5.run/static/signal.png">
@@ -10,37 +10,57 @@
 <body>
 
     <div class="vb-header">
-        <div class="logo-area">
-            <img src="https://ci5.run/static/signal.png" class="vb-logo" alt="Ci5">
-            <div class="logo-text">
-                <div class="brand">ci5<span class="brand-tld">.network</span></div>
-                <div class="slogan">Community Forums</div>
+        <div class="header-left">
+            <a href="https://github.com/dreamswag/ci5" target="_blank" class="logo-group">
+                <img src="https://ci5.run/static/signal.png" class="vb-logo" alt="Ci5">
+                <div class="logo-text">
+                    <div class="brand">ci5<span class="brand-tld">.network</span></div>
+                </div>
+            </a>
+            <div class="header-links">
+                <a href="https://ci5.run" class="header-link">run</a>
+                <a href="https://ci5.host" class="header-link">host</a>
+                <a href="https://ci5.dev" class="header-link">dev</a>
             </div>
         </div>
-        <div class="header-links">
-            <a href="https://ci5.run" class="header-link">run</a>
-            <a href="https://ci5.host" class="header-link">host</a>
-            <a href="https://ci5.dev" class="header-link">dev</a>
+        <div class="header-right">
+            <div class="nav-links">
+                <a href="#" class="nav-link active" data-view="index">Forums</a>
+                <a href="#" class="nav-link" data-view="leaderboard">Leaderboard</a>
+                <a href="#" class="nav-link" data-view="submit">Submit RRUL</a>
+                <a href="#" class="nav-link" data-view="blacklist">Blacklist</a>
+            </div>
         </div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </div>
 
-    <div class="vb-navbar">
-        <div class="nav-links">
-            <a href="#" class="nav-link active" data-view="index">Forums</a>
-            <a href="#" class="nav-link" data-view="leaderboard">Leaderboard</a>
-            <a href="#" class="nav-link" data-view="submit">Submit RRUL</a>
-            <a href="#" class="nav-link" data-view="blacklist">Blacklist</a>
-        </div>
-        <div class="search-area">
-            <input type="text" class="search-input" placeholder="Search..." id="search-input">
-            <button class="vb-btn" onclick="doSearch()">Go</button>
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-nav-drawer hidden" id="mobileNavDrawer">
+        <div class="mobile-nav-content">
+            <div class="mobile-nav-section">
+                <div class="mobile-nav-header">Navigation</div>
+                <a href="#" class="mobile-nav-link active" data-view="index">Forums</a>
+                <a href="#" class="mobile-nav-link" data-view="leaderboard">Leaderboard</a>
+                <a href="#" class="mobile-nav-link" data-view="submit">Submit RRUL</a>
+                <a href="#" class="mobile-nav-link" data-view="blacklist">Blacklist</a>
+            </div>
+            <div class="mobile-nav-section">
+                <div class="mobile-nav-header">Ecosystem</div>
+                <a href="https://ci5.run" class="mobile-nav-link external">ci5.run</a>
+                <a href="https://ci5.host" class="mobile-nav-link external">ci5.host</a>
+                <a href="https://ci5.dev" class="mobile-nav-link external">ci5.dev</a>
+            </div>
         </div>
     </div>
 
     <div class="vb-body">
-        <div class="breadcrumb">
-            <span class="crumb-icon">🏠</span> 
-            <span id="nav-trail">ci5.network › Forums › Index</span>
+        <div class="search-bar-mobile">
+            <input type="text" class="search-input" placeholder="Search..." id="search-input">
+            <button class="vb-btn" onclick="doSearch()">Go</button>
         </div>
 
         <div class="welcome-panel" id="welcome-panel">
@@ -88,15 +108,6 @@
             <!-- ===== INDEX VIEW ===== -->
             <div class="view-panel" id="view-index">
 
-                <!-- Repo Tabs -->
-                <div class="repo-tabs">
-                    <a href="#" class="repo-tab active" data-repo="all">cAll5</a>
-                    <a href="#" class="repo-tab" data-repo="ci5">ci5</a>
-                    <a href="#" class="repo-tab" data-repo="ci5.network">.network</a>
-                    <a href="#" class="repo-tab" data-repo="ci5.host">.host</a>
-                    <a href="#" class="repo-tab" data-repo="ci5.dev">.dev</a>   
-                </div>
-
                 <!-- Performance Arena -->
                 <div class="forum-table" data-repos="ci5.network">
                     <div class="cat-header gold">
@@ -107,20 +118,23 @@
                         <table width="100%" cellpadding="0" cellspacing="1">
                             <tr class="thead-row">
                                 <th width="5%"></th>
-                                <th width="50%">Forum</th>
-                                <th width="10%">Threads</th>
-                                <th width="10%">Posts</th>
-                                <th width="25%">Last Post</th>
+                                <th>Forum</th>
+                                <th class="hide-mobile" width="10%">Threads</th>
+                                <th class="hide-mobile" width="10%">Posts</th>
+                                <th class="hide-mobile" width="25%">Last Post</th>
                             </tr>
                             <tr class="forum-row alt-a" data-category="metrics">
                                 <td align="center"><div class="f-icon new">📊</div></td>
                                 <td>
                                     <div class="forum-title"><a href="#" onclick="viewCategory('metrics'); return false;">RRUL Submissions</a></div>
                                     <div class="forum-desc">Post your Realtime Response Under Load results. Auto-indexed to leaderboard.</div>
+                                    <div class="forum-meta-mobile">
+                                        <span id="metrics-threads-m">0</span> threads · <span id="metrics-posts-m">0</span> posts
+                                    </div>
                                 </td>
-                                <td align="center" id="metrics-threads">—</td>
-                                <td align="center" id="metrics-posts">—</td>
-                                <td class="last-post" id="metrics-last">Loading...</td>
+                                <td class="hide-mobile" align="center" id="metrics-threads">—</td>
+                                <td class="hide-mobile" align="center" id="metrics-posts">—</td>
+                                <td class="last-post hide-mobile" id="metrics-last">Loading...</td>
                             </tr>
                             <tr class="forum-row alt-b">
                                 <td align="center"><div class="f-icon gold">👑</div></td>
@@ -128,9 +142,9 @@
                                     <div class="forum-title"><a href="#" onclick="switchView('leaderboard'); return false;">Holy CiG5 🤯 [& St. Guinea Ci5 🐹🪽]</a></div>
                                     <div class="forum-desc">Verified 1.74Gbps+ entries only.</div>
                                 </td>
-                                <td align="center">0</td>
-                                <td align="center">0</td>
-                                <td class="last-post"><span class="dim">Awaiting first champion...</span></td>
+                                <td class="hide-mobile" align="center">0</td>
+                                <td class="hide-mobile" align="center">0</td>
+                                <td class="last-post hide-mobile"><span class="dim">Awaiting first champion...</span></td>
                             </tr>
                         </table>
                     </div>
@@ -146,20 +160,23 @@
                         <table width="100%" cellpadding="0" cellspacing="1">
                             <tr class="thead-row">
                                 <th width="5%"></th>
-                                <th width="50%">Forum</th>
-                                <th width="10%">Threads</th>
-                                <th width="10%">Posts</th>
-                                <th width="25%">Last Post</th>
+                                <th>Forum</th>
+                                <th class="hide-mobile" width="10%">Threads</th>
+                                <th class="hide-mobile" width="10%">Posts</th>
+                                <th class="hide-mobile" width="25%">Last Post</th>
                             </tr>
                             <tr class="forum-row alt-a" data-category="announcements">
                                 <td align="center"><div class="f-icon">📢</div></td>
                                 <td>
                                     <div class="forum-title"><a href="#" onclick="viewCategory('announcements'); return false;">Announcements</a></div>
                                     <div class="forum-desc">Official project updates and releases.</div>
+                                    <div class="forum-meta-mobile">
+                                        <span id="announcements-threads-m">0</span> threads · <span id="announcements-posts-m">0</span> posts
+                                    </div>
                                 </td>
-                                <td align="center" id="announcements-threads">—</td>
-                                <td align="center" id="announcements-posts">—</td>
-                                <td class="last-post" id="announcements-last">Loading...</td>
+                                <td class="hide-mobile" align="center" id="announcements-threads">—</td>
+                                <td class="hide-mobile" align="center" id="announcements-posts">—</td>
+                                <td class="last-post hide-mobile" id="announcements-last">Loading...</td>
                             </tr>
                         </table>
                     </div>
@@ -175,30 +192,36 @@
                         <table width="100%" cellpadding="0" cellspacing="1">
                             <tr class="thead-row">
                                 <th width="5%"></th>
-                                <th width="50%">Forum</th>
-                                <th width="10%">Threads</th>
-                                <th width="10%">Posts</th>
-                                <th width="25%">Last Post</th>
+                                <th>Forum</th>
+                                <th class="hide-mobile" width="10%">Threads</th>
+                                <th class="hide-mobile" width="10%">Posts</th>
+                                <th class="hide-mobile" width="25%">Last Post</th>
                             </tr>
                             <tr class="forum-row alt-a" data-category="intel_req">
                                 <td align="center"><div class="f-icon">🚨</div></td>
                                 <td>
                                     <div class="forum-title"><a href="#" onclick="viewCategory('intel_req'); return false;">INTEL_REQ</a></div>
                                     <div class="forum-desc">Unsolved queries, malfunctions, troubleshooting. Include bone_marrow.sh output.</div>
+                                    <div class="forum-meta-mobile">
+                                        <span id="intel_req-threads-m">0</span> threads · <span id="intel_req-posts-m">0</span> posts
+                                    </div>
                                 </td>
-                                <td align="center" id="intel_req-threads">—</td>
-                                <td align="center" id="intel_req-posts">—</td>
-                                <td class="last-post" id="intel_req-last">Loading...</td>
+                                <td class="hide-mobile" align="center" id="intel_req-threads">—</td>
+                                <td class="hide-mobile" align="center" id="intel_req-posts">—</td>
+                                <td class="last-post hide-mobile" id="intel_req-last">Loading...</td>
                             </tr>
                             <tr class="forum-row alt-b" data-category="armory">
                                 <td align="center"><div class="f-icon">🛠️</div></td>
                                 <td>
                                     <div class="forum-title"><a href="#" onclick="viewCategory('armory'); return false;">ARMORY</a></div>
                                     <div class="forum-desc">Hardware Showcase. Custom enclosures, cooling mods, HAT implementations.</div>
+                                    <div class="forum-meta-mobile">
+                                        <span id="armory-threads-m">0</span> threads · <span id="armory-posts-m">0</span> posts
+                                    </div>
                                 </td>
-                                <td align="center" id="armory-threads">—</td>
-                                <td align="center" id="armory-posts">—</td>
-                                <td class="last-post" id="armory-last">Loading...</td>
+                                <td class="hide-mobile" align="center" id="armory-threads">—</td>
+                                <td class="hide-mobile" align="center" id="armory-posts">—</td>
+                                <td class="last-post hide-mobile" id="armory-last">Loading...</td>
                             </tr>
                         </table>
                     </div>
@@ -214,20 +237,23 @@
                         <table width="100%" cellpadding="0" cellspacing="1">
                             <tr class="thead-row">
                                 <th width="5%"></th>
-                                <th width="50%">Forum</th>
-                                <th width="10%">Threads</th>
-                                <th width="10%">Posts</th>
-                                <th width="25%">Last Post</th>
+                                <th>Forum</th>
+                                <th class="hide-mobile" width="10%">Threads</th>
+                                <th class="hide-mobile" width="10%">Posts</th>
+                                <th class="hide-mobile" width="25%">Last Post</th>
                             </tr>
                             <tr class="forum-row alt-a" data-category="cork-submissions">
                                 <td align="center"><div class="f-icon new">🧪</div></td>
                                 <td>
                                     <div class="forum-title"><a href="#" onclick="viewCategory('cork-submissions'); return false;">Cork Submissions</a></div>
                                     <div class="forum-desc">Submit containers for Winery processing. Community review pipeline.</div>
+                                    <div class="forum-meta-mobile">
+                                        <span id="cork-submissions-threads-m">0</span> threads · <span id="cork-submissions-posts-m">0</span> posts
+                                    </div>
                                 </td>
-                                <td align="center" id="cork-submissions-threads">—</td>
-                                <td align="center" id="cork-submissions-posts">—</td>
-                                <td class="last-post" id="cork-submissions-last">Loading...</td>
+                                <td class="hide-mobile" align="center" id="cork-submissions-threads">—</td>
+                                <td class="hide-mobile" align="center" id="cork-submissions-posts">—</td>
+                                <td class="last-post hide-mobile" id="cork-submissions-last">Loading...</td>
                             </tr>
                         </table>
                     </div>
@@ -243,10 +269,10 @@
                         <table width="100%" cellpadding="0" cellspacing="1">
                             <tr class="thead-row">
                                 <th width="5%"></th>
-                                <th width="50%">Forum</th>
-                                <th width="10%">Entries</th>
-                                <th width="10%">Reports</th>
-                                <th width="25%">Last Entry</th>
+                                <th>Forum</th>
+                                <th class="hide-mobile" width="10%">Entries</th>
+                                <th class="hide-mobile" width="10%">Reports</th>
+                                <th class="hide-mobile" width="25%">Last Entry</th>
                             </tr>
                             <tr class="forum-row alt-a">
                                 <td align="center"><div class="f-icon shame">🚫</div></td>
@@ -254,9 +280,9 @@
                                     <div class="forum-title"><a href="#" onclick="switchView('blacklist'); return false;">Compromised Corks & Blacklisted HWIDs</a></div>
                                     <div class="forum-desc">Flagged for CVEs, malware, abuse. Auto-blocked by ci5.run bootstrap.</div>
                                 </td>
-                                <td align="center" id="blacklist-entries">—</td>
-                                <td align="center" id="blacklist-reports">—</td>
-                                <td class="last-post" id="blacklist-last">Loading...</td>
+                                <td class="hide-mobile" align="center" id="blacklist-entries">—</td>
+                                <td class="hide-mobile" align="center" id="blacklist-reports">—</td>
+                                <td class="last-post hide-mobile" id="blacklist-last">Loading...</td>
                             </tr>
                         </table>
                     </div>
@@ -279,41 +305,45 @@
 
                 <div class="forum-table">
                     <div class="cat-header gold">🐹🪽 Holy CiG5 🤯 — Top Performers</div>
-                    <table class="data-table" width="100%">
-                        <tr class="thead-row">
-                            <th>Rank</th>
-                            <th>Pilot</th>
-                            <th>Throughput</th>
-                            <th>Latency</th>
-                            <th>Hardware</th>
-                            <th>Date</th>
-                        </tr>
-                        <tbody id="lb-top-body">
-                            <tr class="bounty-row">
-                                <td colspan="6">
-                                    <div class="bounty-text">⚡ 1.74Gbps BOUNTY UNCLAIMED ⚡</div>
-                                    <div class="bounty-sub">Be the first to break the barrier</div>
-                                </td>
+                    <div class="table-scroll">
+                        <table class="data-table" width="100%">
+                            <tr class="thead-row">
+                                <th>Rank</th>
+                                <th>Pilot</th>
+                                <th>Throughput</th>
+                                <th class="hide-mobile">Latency</th>
+                                <th class="hide-mobile">Hardware</th>
+                                <th class="hide-mobile">Date</th>
                             </tr>
-                        </tbody>
-                    </table>
+                            <tbody id="lb-top-body">
+                                <tr class="bounty-row">
+                                    <td colspan="6">
+                                        <div class="bounty-text">⚡ 1.74Gbps BOUNTY UNCLAIMED ⚡</div>
+                                        <div class="bounty-sub">Be the first to break the barrier</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div class="forum-table">
                     <div class="cat-header">📊 Recent Verified Submissions</div>
-                    <table class="data-table" width="100%">
-                        <tr class="thead-row">
-                            <th>Pilot</th>
-                            <th>Download</th>
-                            <th>Upload</th>
-                            <th>Latency</th>
-                            <th>Cork</th>
-                            <th>Submitted</th>
-                        </tr>
-                        <tbody id="lb-recent-body">
-                            <tr><td colspan="6" class="loading-row">Loading submissions...</td></tr>
-                        </tbody>
-                    </table>
+                    <div class="table-scroll">
+                        <table class="data-table" width="100%">
+                            <tr class="thead-row">
+                                <th>Pilot</th>
+                                <th>Download</th>
+                                <th class="hide-mobile">Upload</th>
+                                <th class="hide-mobile">Latency</th>
+                                <th class="hide-mobile">Cork</th>
+                                <th>Submitted</th>
+                            </tr>
+                            <tbody id="lb-recent-body">
+                                <tr><td colspan="6" class="loading-row">Loading submissions...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div class="back-nav">
@@ -378,33 +408,37 @@
 
                 <div class="forum-table">
                     <div class="cat-header shame">Confirmed Compromised Corks</div>
-                    <table class="data-table" width="100%">
-                        <tr class="thead-row">
-                            <th>Cork ID</th>
-                            <th>Reason</th>
-                            <th>CVE</th>
-                            <th>Severity</th>
-                            <th>Blocked Since</th>
-                        </tr>
-                        <tbody id="bl-corks-body">
-                            <tr><td colspan="5" class="loading-row">Loading blacklist...</td></tr>
-                        </tbody>
-                    </table>
+                    <div class="table-scroll">
+                        <table class="data-table" width="100%">
+                            <tr class="thead-row">
+                                <th>Cork ID</th>
+                                <th>Reason</th>
+                                <th class="hide-mobile">CVE</th>
+                                <th>Severity</th>
+                                <th class="hide-mobile">Blocked Since</th>
+                            </tr>
+                            <tbody id="bl-corks-body">
+                                <tr><td colspan="5" class="loading-row">Loading blacklist...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div class="forum-table">
                     <div class="cat-header shame">Hardware-ID Blacklist</div>
-                    <table class="data-table" width="100%">
-                        <tr class="thead-row">
-                            <th>HWID (Partial)</th>
-                            <th>Reason</th>
-                            <th>Banned Since</th>
-                            <th>Appeal</th>
-                        </tr>
-                        <tbody id="bl-hwid-body">
-                            <tr><td colspan="4" class="loading-row">Loading blacklist...</td></tr>
-                        </tbody>
-                    </table>
+                    <div class="table-scroll">
+                        <table class="data-table" width="100%">
+                            <tr class="thead-row">
+                                <th>HWID (Partial)</th>
+                                <th>Reason</th>
+                                <th class="hide-mobile">Banned Since</th>
+                                <th class="hide-mobile">Appeal</th>
+                            </tr>
+                            <tbody id="bl-hwid-body">
+                                <tr><td colspan="4" class="loading-row">Loading blacklist...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div class="back-nav">
@@ -422,7 +456,7 @@
                         <tr class="thead-row">
                             <th width="5%"></th>
                             <th>Thread / Started By</th>
-                            <th width="15%">Last Post</th>
+                            <th class="hide-mobile" width="15%">Last Post</th>
                             <th width="8%">Replies</th>
                         </tr>
                         <tbody id="thread-list">
@@ -470,5 +504,39 @@
     </div>
 
     <script src="static/script.js"></script>
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            const drawer = document.getElementById('mobileNavDrawer');
+            const btn = this;
+            drawer.classList.toggle('hidden');
+            btn.classList.toggle('active');
+        });
+
+        // Mobile nav links
+        document.querySelectorAll('.mobile-nav-link[data-view]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const view = this.dataset.view;
+                switchView(view);
+                document.getElementById('mobileNavDrawer').classList.add('hidden');
+                document.getElementById('mobileMenuBtn').classList.remove('active');
+                
+                // Update active state
+                document.querySelectorAll('.mobile-nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Close drawer when clicking outside
+        document.addEventListener('click', function(e) {
+            const drawer = document.getElementById('mobileNavDrawer');
+            const btn = document.getElementById('mobileMenuBtn');
+            if (!drawer.contains(e.target) && !btn.contains(e.target) && !drawer.classList.contains('hidden')) {
+                drawer.classList.add('hidden');
+                btn.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>
