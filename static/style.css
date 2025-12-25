@@ -1,23 +1,24 @@
 /* ============================================
    ci5.network Forums — vBulletin Dark Theme
    Square/Rectangle aesthetic, no border-radius
+   Green accent theme to match ci5.host/ci5.dev
    ============================================ */
 
 :root {
-    --bg-page: #0a0a0a;
-    --bg-table: #111;
-    --bg-row-a: #181818;
-    --bg-row-b: #141414;
-    --header-grad: linear-gradient(to bottom, #222 0%, #151515 100%);
+    --bg-page: #000000;
+    --bg-table: #0a0a0a;
+    --bg-row-a: #111111;
+    --bg-row-b: #0d0d0d;
+    --header-grad: linear-gradient(to bottom, #1a1a1a 0%, #0a0a0a 100%);
     --header-text: #bbb;
-    --text-main: #999;
-    --text-dim: #666;
+    --text-main: #888;
+    --text-dim: #555;
     --border: #000;
-    --highlight: #00c8e0;
-    --link: #7ac82a;
-    --accent: #3a4a60;
+    --highlight: #30d158;
+    --link: #30d158;
+    --accent: #1a2a1a;
     --gold: #c9a000;
-    --shame: #ffffff;
+    --shame: #ff4444;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -32,7 +33,7 @@ body {
 }
 
 a { color: var(--link); text-decoration: none; }
-a:hover { text-decoration: underline; color: var(--highlight); }
+a:hover { text-decoration: underline; color: #4ce070; }
 
 .hidden { display: none !important; }
 .dim { color: var(--text-dim); }
@@ -72,7 +73,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 }
 
 .logo-text .slogan {
-    color: #555;
+    color: #444;
     font-size: 9px;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -85,20 +86,20 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 .header-link {
     padding: 3px 8px;
-    color: #666;
-    border: 1px solid #333;
+    color: #555;
+    border: 1px solid #222;
     font-size: 10px;
 }
 
 .header-link:hover {
     color: var(--highlight);
-    border-color: #555;
+    border-color: #333;
     text-decoration: none;
 }
 
 /* ===== NAVBAR ===== */
 .vb-navbar {
-    background: #1a1a1a;
+    background: #0a0a0a;
     border-bottom: 1px solid #000;
     padding: 4px 10px;
     display: flex;
@@ -112,24 +113,24 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 }
 
 .nav-link {
-    color: #aaa;
+    color: #888;
     font-weight: bold;
     font-size: 10px;
     padding: 5px 12px;
-    background: #252525;
-    border: 1px solid #333;
+    background: #151515;
+    border: 1px solid #222;
 }
 
 .nav-link:hover {
-    background: #333;
+    background: #1a1a1a;
     text-decoration: none;
-    color: #ccc;
+    color: #aaa;
 }
 
 .nav-link.active {
     background: var(--accent);
-    border-color: #4a5a70;
-    color: #ccc;
+    border-color: #2a3a2a;
+    color: var(--highlight);
 }
 
 .search-area {
@@ -138,8 +139,8 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 }
 
 .search-input {
-    background: #0a0a0a;
-    border: 1px solid #333;
+    background: #050505;
+    border: 1px solid #222;
     color: var(--text-main);
     padding: 4px 8px;
     font-size: 10px;
@@ -148,33 +149,33 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 .search-input:focus {
     outline: none;
-    border-color: #555;
+    border-color: var(--highlight);
 }
 
 /* ===== VB-BTN ===== */
 .vb-btn {
-    background: #222;
-    border: 1px solid #444;
-    color: #999;
+    background: #111;
+    border: 1px solid #333;
+    color: #888;
     padding: 4px 10px;
     font-size: 10px;
     cursor: pointer;
 }
 
 .vb-btn:hover {
-    background: #2a2a2a;
-    border-color: #555;
-    color: #bbb;
+    background: #1a1a1a;
+    border-color: #444;
+    color: #aaa;
 }
 
 .vb-btn.primary {
     background: var(--accent);
-    border-color: #4a5a70;
-    color: #ccc;
+    border-color: #2a3a2a;
+    color: var(--highlight);
 }
 
 .vb-btn.primary:hover {
-    background: #4a5a70;
+    background: #2a3a2a;
 }
 
 /* ===== BODY CONTAINER ===== */
@@ -187,8 +188,8 @@ a:hover { text-decoration: underline; color: var(--highlight); }
     font-size: 10px;
     margin-bottom: 8px;
     padding: 6px 0;
-    border-bottom: 1px solid #1a1a1a;
-    color: #555;
+    border-bottom: 1px solid #111;
+    color: #444;
 }
 
 .crumb-icon {
@@ -198,9 +199,9 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 /* ===== WELCOME PANEL ===== */
 .welcome-panel {
-    background: #101010;
+    background: #080808;
     border: 1px solid #000;
-    border-top: 1px solid #222;
+    border-top: 1px solid #1a1a1a;
     padding: 6px 10px;
     margin-bottom: 10px;
 }
@@ -213,13 +214,13 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 .welcome-text {
     font-size: 11px;
-    color: #888;
+    color: #777;
 }
 
 .user-avatar {
     width: 24px;
     height: 24px;
-    border: 1px solid #333;
+    border: 1px solid #222;
     margin-right: 8px;
 }
 
@@ -237,24 +238,24 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 .repo-tab {
     padding: 5px 12px;
-    background: #151515;
-    border: 1px solid #222;
+    background: #0a0a0a;
+    border: 1px solid #1a1a1a;
     border-bottom: 1px solid #000;
-    color: #666;
+    color: #555;
     font-size: 10px;
 }
 
 .repo-tab:hover {
-    background: #1a1a1a;
-    color: #888;
+    background: #111;
+    color: #777;
     text-decoration: none;
 }
 
 .repo-tab.active {
-    background: #111;
+    background: #0a0a0a;
     color: var(--highlight);
-    border-color: #333;
-    border-bottom: 1px solid #111;
+    border-color: #222;
+    border-bottom: 1px solid #0a0a0a;
 }
 
 /* ===== FORUM TABLES ===== */
@@ -271,8 +272,8 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 }
 
 .cat-header {
-    background: linear-gradient(to bottom, #1a1a1a 0%, #101010 100%);
-    color: #999;
+    background: linear-gradient(to bottom, #111 0%, #080808 100%);
+    color: #888;
     font-weight: bold;
     font-size: 11px;
     padding: 5px 10px;
@@ -280,24 +281,24 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 }
 
 .cat-header.gold {
-    background: linear-gradient(to bottom, #1a1500 0%, #0f0d00 100%);
+    background: linear-gradient(to bottom, #1a1500 0%, #0a0800 100%);
     color: var(--gold);
 }
 
 .cat-header.shame {
-    background: linear-gradient(to bottom, #1a0000 0%, #0f0000 100%);
+    background: linear-gradient(to bottom, #1a0000 0%, #080000 100%);
     color: var(--shame);
 }
 
 .collapse-btn {
     float: right;
     cursor: pointer;
-    color: #555;
+    color: #444;
     font-family: monospace;
 }
 
 .collapse-btn:hover {
-    color: #888;
+    color: #777;
 }
 
 .cat-body {
@@ -310,7 +311,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 .thead-row th {
     background: var(--accent);
-    color: #aaa;
+    color: #999;
     font-weight: normal;
     padding: 3px 8px;
     text-align: left;
@@ -328,14 +329,14 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 .alt-b { background: var(--bg-row-b); }
 
 .forum-row:hover {
-    background: #1e1e1e;
+    background: #151515;
 }
 
 /* ===== FORUM ICONS ===== */
 .f-icon {
     font-size: 18px;
     text-align: center;
-    color: #444;
+    color: #333;
     width: 32px;
 }
 
@@ -357,7 +358,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 }
 
 .forum-title a {
-    color: #bbb;
+    color: #aaa;
 }
 
 .forum-title a:hover {
@@ -366,13 +367,13 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 .forum-desc {
     font-size: 10px;
-    color: #555;
+    color: #444;
     margin-top: 2px;
 }
 
 .last-post {
     font-size: 9px;
-    color: #555;
+    color: #444;
     line-height: 1.3;
 }
 
@@ -384,7 +385,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 .data-table th {
     background: var(--accent);
-    color: #aaa;
+    color: #999;
     font-weight: normal;
     padding: 4px 10px;
     text-align: left;
@@ -404,7 +405,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 }
 
 .data-table tr:hover td {
-    background: #1e1e1e;
+    background: #151515;
 }
 
 /* ===== ACTIVITY LIST ===== */
@@ -423,12 +424,12 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 }
 
 .activity-item:hover {
-    background: #151515;
+    background: #111;
 }
 
 .activity-icon {
     font-size: 12px;
-    color: #444;
+    color: #333;
 }
 
 .activity-content {
@@ -436,11 +437,11 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 }
 
 .activity-title {
-    color: #999;
+    color: #888;
 }
 
 .activity-meta {
-    color: #444;
+    color: #333;
     font-size: 9px;
     margin-top: 2px;
 }
@@ -448,7 +449,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 .loading-row {
     padding: 15px;
     text-align: center;
-    color: #444;
+    color: #333;
     background: var(--bg-table);
 }
 
@@ -456,7 +457,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 .page-title {
     font-size: 13px;
     font-weight: bold;
-    color: #aaa;
+    color: #999;
     padding: 6px 0;
     margin-bottom: 5px;
     border-bottom: 1px solid var(--highlight);
@@ -469,7 +470,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 .page-desc {
     font-size: 10px;
-    color: #555;
+    color: #444;
     margin-bottom: 12px;
 }
 
@@ -477,7 +478,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 .bounty-row td {
     text-align: center;
     padding: 16px;
-    background: linear-gradient(to bottom, #151000 0%, #0a0800 100%);
+    background: linear-gradient(to bottom, #0f0a00 0%, #050300 100%);
 }
 
 .bounty-text {
@@ -489,7 +490,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 .bounty-sub {
     font-size: 10px;
-    color: #555;
+    color: #444;
 }
 
 /* ===== SPEED VALUES ===== */
@@ -513,15 +514,15 @@ a:hover { text-decoration: underline; color: var(--highlight); }
     padding: 1px 5px;
     font-size: 9px;
     font-weight: bold;
-    background: #222;
-    color: #888;
+    background: #111;
+    color: #777;
     margin-right: 4px;
 }
 
-.reason-malware { background: #330033; color: #cc88cc; }
-.reason-cve { background: #332200; color: #cc8844; }
-.reason-root { background: #330000; color: #cc6666; }
-.reason-abuse { background: #222; color: #888; }
+.reason-malware { background: #220022; color: #cc88cc; }
+.reason-cve { background: #221100; color: #cc8844; }
+.reason-root { background: #220000; color: #cc6666; }
+.reason-abuse { background: #111; color: #777; }
 
 /* ===== FORMS ===== */
 .form-body {
@@ -536,7 +537,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 .auth-required p {
     margin-bottom: 10px;
-    color: #666;
+    color: #555;
 }
 
 .form-fields {
@@ -551,7 +552,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
     display: block;
     font-size: 10px;
     font-weight: bold;
-    color: #666;
+    color: #555;
     margin-bottom: 3px;
 }
 
@@ -559,9 +560,9 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 .form-group select,
 .form-group textarea {
     width: 100%;
-    background: #0a0a0a;
-    border: 1px solid #333;
-    color: #999;
+    background: #050505;
+    border: 1px solid #222;
+    color: #888;
     padding: 5px 8px;
     font-size: 11px;
     font-family: inherit;
@@ -577,7 +578,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #555;
+    border-color: var(--highlight);
 }
 
 .form-row {
@@ -598,7 +599,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 /* ===== THREAD VIEW ===== */
 .thread-title-bar {
     background: #000;
-    color: #aaa;
+    color: #999;
     padding: 8px 10px;
     font-weight: bold;
     font-size: 12px;
@@ -614,8 +615,8 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 }
 
 .post-header {
-    background: #151515;
-    color: #555;
+    background: #0a0a0a;
+    color: #444;
     padding: 3px 10px;
     font-size: 9px;
     display: flex;
@@ -629,7 +630,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 .post-meta {
     width: 140px;
-    background: #0f0f0f;
+    background: #080808;
     padding: 10px;
     border-right: 1px solid #000;
     text-align: center;
@@ -638,7 +639,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 .post-avatar {
     width: 60px;
     height: 60px;
-    border: 1px solid #333;
+    border: 1px solid #222;
     margin: 0 auto 6px;
 }
 
@@ -650,14 +651,14 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 .post-usertitle {
     font-size: 9px;
-    color: #444;
+    color: #333;
     font-style: italic;
     margin-top: 2px;
 }
 
 .post-userinfo {
     font-size: 9px;
-    color: #444;
+    color: #333;
     margin-top: 6px;
     line-height: 1.4;
 }
@@ -668,7 +669,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
     background: var(--bg-row-a);
     font-size: 11px;
     line-height: 1.5;
-    color: #999;
+    color: #888;
 }
 
 .post-content p {
@@ -676,8 +677,8 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 }
 
 .post-content pre {
-    background: #0a0a0a;
-    border: 1px solid #222;
+    background: #050505;
+    border: 1px solid #1a1a1a;
     padding: 8px;
     font-family: 'Courier New', monospace;
     font-size: 10px;
@@ -686,10 +687,10 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 }
 
 .post-content blockquote {
-    border-left: 2px solid #333;
+    border-left: 2px solid #222;
     padding-left: 10px;
     margin: 6px 0;
-    color: #666;
+    color: #555;
 }
 
 /* ===== REPLY BOX ===== */
@@ -705,9 +706,9 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 .reply-form textarea {
     width: 100%;
-    background: #0a0a0a;
-    border: 1px solid #333;
-    color: #999;
+    background: #050505;
+    border: 1px solid #222;
+    color: #888;
     padding: 8px;
     font-size: 11px;
     font-family: inherit;
@@ -717,7 +718,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 .reply-form textarea:focus {
     outline: none;
-    border-color: #555;
+    border-color: var(--highlight);
 }
 
 .reply-actions {
@@ -728,12 +729,12 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 .back-nav {
     margin-top: 12px;
     padding-top: 8px;
-    border-top: 1px solid #1a1a1a;
+    border-top: 1px solid #111;
 }
 
 .back-nav a {
     font-size: 10px;
-    color: #555;
+    color: #444;
 }
 
 .back-nav a:hover {
@@ -747,7 +748,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.95);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -756,19 +757,19 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 
 .vb-modal {
     width: 380px;
-    background: #111;
-    border: 1px solid #333;
+    background: #0a0a0a;
+    border: 1px solid #222;
 }
 
 .modal-body {
     padding: 16px;
     text-align: center;
-    color: #888;
+    color: #777;
 }
 
 .modal-btns {
     padding: 8px;
-    border-top: 1px solid #222;
+    border-top: 1px solid #1a1a1a;
     text-align: right;
 }
 
@@ -779,8 +780,8 @@ a:hover { text-decoration: underline; color: var(--highlight); }
     color: var(--highlight);
     letter-spacing: 3px;
     padding: 12px;
-    background: #0a0a0a;
-    border: 1px solid #333;
+    background: #050505;
+    border: 1px solid #222;
     margin: 12px 0;
 }
 
@@ -788,14 +789,14 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 .footer {
     text-align: center;
     font-size: 9px;
-    color: #444;
+    color: #333;
     margin-top: 15px;
     padding: 12px 0;
-    border-top: 1px solid #1a1a1a;
+    border-top: 1px solid #111;
 }
 
 .footer a {
-    color: #555;
+    color: #444;
 }
 
 .footer a:hover {
@@ -834,7 +835,7 @@ a:hover { text-decoration: underline; color: var(--highlight); }
     .post-meta {
         width: 100%;
         border-right: none;
-        border-bottom: 1px solid #333;
+        border-bottom: 1px solid #222;
         padding: 8px;
     }
 
@@ -850,13 +851,13 @@ a:hover { text-decoration: underline; color: var(--highlight); }
 }
 
 ::-webkit-scrollbar-track {
-    background: #111;
+    background: #080808;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #444;
+    background: #333;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: #444;
 }
