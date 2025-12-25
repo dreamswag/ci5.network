@@ -48,7 +48,7 @@ a:hover, a:active { text-decoration: underline; color: #4ce070; }
 /* ===== UNIFIED HEADER ===== */
 .vb-header {
     background: #000;
-    padding: 8px 12px;
+    padding: 6px 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -56,7 +56,8 @@ a:hover, a:active { text-decoration: underline; color: #4ce070; }
     position: sticky;
     top: 0;
     z-index: 100;
-    gap: 10px;
+    gap: 8px;
+    min-height: 40px;
 }
 
 .header-left {
@@ -145,14 +146,14 @@ a:hover, a:active { text-decoration: underline; color: #4ce070; }
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 4px;
-    width: 32px;
-    height: 32px;
+    gap: 3px;
+    width: 28px;
+    height: 28px;
     background: transparent;
     border: 1px solid #333;
     border-radius: 4px;
     cursor: pointer;
-    padding: 6px;
+    padding: 5px;
 }
 
 .mobile-menu-btn span {
@@ -178,18 +179,20 @@ a:hover, a:active { text-decoration: underline; color: #4ce070; }
 /* Mobile Navigation Drawer */
 .mobile-nav-drawer {
     position: fixed;
-    top: 44px;
+    top: 40px;
     left: 0;
     right: 0;
-    background: rgba(10, 10, 10, 0.98);
+    background: rgba(5, 5, 5, 0.98);
     border-bottom: 1px solid var(--highlight);
     z-index: 99;
-    max-height: calc(100vh - 44px);
+    max-height: calc(100vh - 40px);
+    max-height: calc(100dvh - 40px);
     overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
 }
 
 .mobile-nav-content {
-    padding: 12px;
+    padding: 10px 12px 20px 12px;
 }
 
 .mobile-nav-section {
@@ -501,15 +504,43 @@ a:hover, a:active { text-decoration: underline; color: #4ce070; }
 /* Forum table full width on mobile */
 .forum-table {
     width: 100%;
+    margin-bottom: 10px;
 }
 
 .forum-table table {
     width: 100%;
-    table-layout: auto;
+    table-layout: fixed;
 }
 
-.forum-row td:nth-child(2) {
-    width: 100%;
+/* On mobile: icon column fixed, forum column takes rest */
+.forum-table table th:first-child,
+.forum-table table td:first-child {
+    width: 40px;
+}
+
+.forum-table table th:nth-child(2),
+.forum-table table td:nth-child(2) {
+    width: calc(100% - 40px);
+}
+
+.forum-row td {
+    padding: 10px 8px;
+    vertical-align: top;
+    border-bottom: 1px solid #000;
+}
+
+.forum-title {
+    font-size: 13px;
+    font-weight: bold;
+    word-wrap: break-word;
+}
+
+.forum-desc {
+    font-size: 11px;
+    color: #666;
+    margin-top: 4px;
+    line-height: 1.4;
+    word-wrap: break-word;
 }
 
 /* ===== TABLE SCROLL WRAPPER ===== */
@@ -1024,6 +1055,34 @@ a:hover, a:active { text-decoration: underline; color: #4ce070; }
         display: none;
     }
     
+    /* Restore auto table layout on tablet+ */
+    .forum-table table {
+        table-layout: auto;
+    }
+    
+    .forum-table table th:first-child,
+    .forum-table table td:first-child {
+        width: 5%;
+    }
+    
+    .forum-table table th:nth-child(2),
+    .forum-table table td:nth-child(2) {
+        width: auto;
+    }
+    
+    .forum-row td {
+        vertical-align: middle;
+    }
+    
+    .forum-title {
+        font-size: 12px;
+    }
+    
+    .forum-desc {
+        font-size: 10px;
+        color: #444;
+    }
+    
     .form-row {
         flex-direction: row;
     }
@@ -1112,19 +1171,23 @@ a:hover, a:active { text-decoration: underline; color: #4ce070; }
     .vb-btn,
     .repo-tab,
     .nav-link,
-    .mobile-nav-link,
-    .forum-row {
+    .mobile-nav-link {
         min-height: 44px;
         display: flex;
         align-items: center;
+    }
+    
+    .forum-row {
+        min-height: 44px;
     }
     
     .forum-row td {
         padding: 12px 8px;
     }
     
+    /* Keep menu button compact */
     .mobile-menu-btn {
-        min-width: 44px;
-        min-height: 44px;
+        min-width: 36px;
+        min-height: 36px;
     }
 }
