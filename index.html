@@ -38,7 +38,6 @@
         </button>
     </div>
 
-    <!-- Mobile Navigation Drawer -->
     <div class="mobile-nav-drawer hidden" id="mobileNavDrawer">
         <div class="mobile-nav-content">
             <div class="mobile-nav-section">
@@ -76,7 +75,6 @@
             </div>
         </div>
 
-        <!-- Device Auth Modal -->
         <div class="overlay hidden" id="device-modal">
             <div class="vb-modal">
                 <div class="cat-header">GitHub Device Authorization</div>
@@ -96,13 +94,10 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div id="main-content">
 
-            <!-- ===== INDEX VIEW ===== -->
             <div class="view-panel" id="view-index">
 
-                <!-- Performance Arena -->
                 <div class="forum-table" data-repos="ci5.network">
                     <div class="cat-header gold">
                         <span class="collapse-btn" onclick="toggleCategory(this)">[−]</span>
@@ -144,7 +139,6 @@
                     </div>
                 </div>
 
-                <!-- Documentation -->
                 <div class="forum-table" data-repos="ci5.network,ci5">
                     <div class="cat-header">
                         <span class="collapse-btn" onclick="toggleCategory(this)">[−]</span>
@@ -176,7 +170,6 @@
                     </div>
                 </div>
 
-                <!-- Community -->
                 <div class="forum-table" data-repos="ci5.network,ci5,ci5.host,ci5.dev">
                     <div class="cat-header">
                         <span class="collapse-btn" onclick="toggleCategory(this)">[−]</span>
@@ -221,7 +214,6 @@
                     </div>
                 </div>
 
-                <!-- Cork Development -->
                 <div class="forum-table" data-repos="ci5.dev">
                     <div class="cat-header">
                         <span class="collapse-btn" onclick="toggleCategory(this)">[−]</span>
@@ -253,7 +245,6 @@
                     </div>
                 </div>
 
-                <!-- Hall of Shame -->
                 <div class="forum-table" data-repos="ci5.network">
                     <div class="cat-header shame">
                         <span class="collapse-btn" onclick="toggleCategory(this)">[−]</span>
@@ -282,7 +273,6 @@
                     </div>
                 </div>
 
-                <!-- Latest Activity -->
                 <div class="forum-table">
                     <div class="cat-header">Latest Activity</div>
                     <div class="activity-list" id="activity-list">
@@ -292,7 +282,6 @@
 
             </div>
 
-            <!-- ===== LEADERBOARD VIEW ===== -->
             <div class="view-panel hidden" id="view-leaderboard">
                 <div class="page-title">Performance Leaderboard</div>
                 <p class="page-desc">1.74Gbps Gauntlet. First verified submission claims eternal glory 🐹🪽 </p>
@@ -330,7 +319,7 @@
                                 <th>Download</th>
                                 <th class="hide-mobile">Upload</th>
                                 <th class="hide-mobile">Latency</th>
-                                <th class="hide-mobile">Cork</th>
+                                <th class="hide-mobile">Hardware / Hash</th>
                                 <th>Submitted</th>
                             </tr>
                             <tbody id="lb-recent-body">
@@ -345,46 +334,72 @@
                 </div>
             </div>
 
-            <!-- ===== SUBMIT VIEW ===== -->
             <div class="view-panel hidden" id="view-submit">
                 <div class="page-title">Submit RRUL Results</div>
-                <p class="page-desc">Upload your Realtime Response Under Load test for leaderboard indexing.</p>
+                <p class="page-desc">Attested Execution via <code>ci5</code> CLI is required for Leaderboard verification.</p>
 
-                <div class="forum-table">
-                    <div class="cat-header">Submission Form</div>
-                    <div class="form-body">
-                        <div class="auth-required" id="submit-auth-required">
-                            <p>You must be logged in to submit results.</p>
+                <div class="auth-required hidden" id="submit-auth-required">
+                    <div class="forum-table">
+                        <div class="cat-header">Authentication Required</div>
+                        <div class="auth-required">
+                            <p>You must be logged in to generate a challenge token.</p>
                             <button class="vb-btn primary" onclick="startDeviceAuth()">Login via GitHub</button>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="form-fields hidden" id="submit-form-fields">
-                            <div class="form-group">
-                                <label>RRUL JSON Output:</label>
-                                <textarea id="rrul-json" placeholder='Paste flent RRUL JSON output...'></textarea>
+                <div id="submit-content" class="hidden">
+                    <div class="forum-table">
+                        <div class="cat-header gold">⚡ Verified Submission (Proof of Work)</div>
+                        <div class="form-body center-text">
+                            <p class="form-instruction">Run this command on your Ci5 device to attest hardware and performance:</p>
+                            
+                            <div class="challenge-box">
+                                <div class="challenge-label">CHALLENGE TOKEN (Expires in 5:00)</div>
+                                <div class="challenge-code" id="challenge-code" onclick="copyChallenge()">LOADING...</div>
+                                <div class="challenge-cmd">ci5 rrul --verify <span id="cmd-token">...</span></div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group half">
-                                    <label>Cork Used:</label>
-                                    <select id="cork-select">
-                                        <option value="">Select Cork...</option>
-                                        <option value="cake-autorate">cake-autorate</option>
-                                        <option value="sqm-scripts">sqm-scripts</option>
-                                        <option value="custom">Custom (specify in notes)</option>
-                                    </select>
+                            
+                            <div class="status-indicator" id="challenge-status">
+                                <span class="spinner"></span> Waiting for device connection...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="forum-table">
+                        <div class="cat-header">
+                            <span class="collapse-btn" onclick="toggleCategory(this)">[+]</span>
+                            📝 Manual Submission (Legacy / Unverified)
+                        </div>
+                        <div class="form-body collapsed">
+                            <div class="form-fields" id="submit-form-fields">
+                                <p class="tiny dim" style="margin-bottom:10px;">Note: Manual submissions are marked as "Unverified" and are ineligible for Gold Badges.</p>
+                                <div class="form-group">
+                                    <label>RRUL JSON Output:</label>
+                                    <textarea id="rrul-json" placeholder='Paste flent RRUL JSON output...'></textarea>
                                 </div>
-                                <div class="form-group half">
-                                    <label>Hardware:</label>
-                                    <input type="text" id="hardware-input" placeholder="e.g., Pi5 8GB + RTL8153">
+                                <div class="form-row">
+                                    <div class="form-group half">
+                                        <label>Cork Used:</label>
+                                        <select id="cork-select">
+                                            <option value="">Select Cork...</option>
+                                            <option value="cake-autorate">cake-autorate</option>
+                                            <option value="sqm-scripts">sqm-scripts</option>
+                                            <option value="custom">Custom (specify in notes)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group half">
+                                        <label>Hardware:</label>
+                                        <input type="text" id="hardware-input" placeholder="e.g., Pi5 8GB + RTL8153">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Notes (optional):</label>
-                                <textarea id="notes-input" rows="3" placeholder="ISP, line speed, any custom tuning..."></textarea>
-                            </div>
-                            <div class="form-actions">
-                                <button class="vb-btn primary" onclick="submitRRUL()">Submit Results</button>
-                                <button class="vb-btn" onclick="previewRRUL()">Preview</button>
+                                <div class="form-group">
+                                    <label>Notes (optional):</label>
+                                    <textarea id="notes-input" rows="3" placeholder="ISP, line speed, any custom tuning..."></textarea>
+                                </div>
+                                <div class="form-actions">
+                                    <button class="vb-btn" onclick="submitRRUL()">Submit Unverified</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -395,7 +410,6 @@
                 </div>
             </div>
 
-            <!-- ===== BLACKLIST VIEW ===== -->
             <div class="view-panel hidden" id="view-blacklist">
                 <div class="page-title shame">⛔ Hall of .shAME</div>
                 <p class="page-desc">Compromised Corks and blacklisted Hardware IDs. Auto-blocked by ci5.run.</p>
@@ -440,7 +454,6 @@
                 </div>
             </div>
 
-            <!-- ===== CATEGORY VIEW ===== -->
             <div class="view-panel hidden" id="view-category">
                 <div class="page-title" id="category-title">Loading...</div>
 
@@ -464,7 +477,6 @@
                 </div>
             </div>
 
-            <!-- ===== THREAD VIEW ===== -->
             <div class="view-panel hidden" id="view-thread">
                 <div class="thread-title-bar" id="thread-title-bar">Loading...</div>
 

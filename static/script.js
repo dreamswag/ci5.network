@@ -5,8 +5,9 @@
 
 // ===== CONFIGURATION =====
 const CONFIG = {
-    // GitHub OAuth App Client ID (replace with yours)
-    clientId: 'YOUR_GITHUB_CLIENT_ID',
+    // GitHub OAuth App Client ID (Shared Ecosystem ID)
+    // Same ID used for ci5.dev and ci5 CLI
+    clientId: 'Ov23liSwq6nuhqFog2xr',
     
     // Repos to aggregate
     repos: [
@@ -25,11 +26,14 @@ const CONFIG = {
         'cork-submissions': { repo: 'ci5.dev', ghCategory: 'General', title: 'Cork Submissions' }
     },
     
-    // API endpoints
+    // API endpoints (Mocked/Placeholder for static site)
     api: {
         leaderboard: '/api/leaderboard',
         blacklist: '/api/blacklist',
         submit: '/api/submit',
+        submitVerified: '/api/submit/verified',
+        getChallenge: '/api/challenge/new',
+        checkChallenge: '/api/challenge/status',
         deviceCode: '/api/auth/device-code',
         pollToken: '/api/auth/poll-token'
     }
@@ -43,7 +47,9 @@ const state = {
     currentCategory: null,
     currentThread: null,
     currentRepo: 'all',
-    deviceFlowInterval: null
+    deviceFlowInterval: null,
+    challengeInterval: null,
+    activeChallenge: null
 };
 
 // ===== INIT =====
@@ -89,9 +95,15 @@ function switchView(view) {
     updateBreadcrumb(view);
     state.currentView = view;
     
+    // Cleanup intervals
+    if (state.challengeInterval) {
+        clearInterval(state.challengeInterval);
+        state.challengeInterval = null;
+    }
+
     if (view === 'leaderboard') loadLeaderboard();
     if (view === 'blacklist') loadBlacklist();
-    if (view === 'submit') updateSubmitForm();
+    if (view === 'submit') initSubmitView();
 }
 
 function updateBreadcrumb(view) {
@@ -103,7 +115,8 @@ function updateBreadcrumb(view) {
         'category': `ci5.network › Forums › ${state.currentCategory?.title || 'Category'}`,
         'thread': `ci5.network › Forums › Thread`
     };
-    document.getElementById('nav-trail').textContent = crumbs[view] || crumbs['index'];
+    const nav = document.getElementById('nav-trail');
+    if (nav) nav.textContent = crumbs[view] || crumbs['index'];
 }
 
 // ===== REPO FILTERING =====
@@ -158,7 +171,7 @@ function updateAuthUI() {
     const guest = document.getElementById('welcome-guest');
     const user = document.getElementById('welcome-user');
     const submitAuth = document.getElementById('submit-auth-required');
-    const submitForm = document.getElementById('submit-form-fields');
+    const submitContent = document.getElementById('submit-content');
     const replyBox = document.getElementById('reply-box');
     
     if (state.user) {
@@ -167,19 +180,15 @@ function updateAuthUI() {
         document.getElementById('user-avatar').src = state.user.avatar_url;
         document.getElementById('user-name').textContent = state.user.login;
         if (submitAuth) submitAuth.classList.add('hidden');
-        if (submitForm) submitForm.classList.remove('hidden');
+        if (submitContent) submitContent.classList.remove('hidden');
         if (replyBox) replyBox.classList.remove('hidden');
     } else {
         guest.classList.remove('hidden');
         user.classList.add('hidden');
         if (submitAuth) submitAuth.classList.remove('hidden');
-        if (submitForm) submitForm.classList.add('hidden');
+        if (submitContent) submitContent.classList.add('hidden');
         if (replyBox) replyBox.classList.add('hidden');
     }
-}
-
-function updateSubmitForm() {
-    updateAuthUI();
 }
 
 // ===== DEVICE FLOW AUTH =====
@@ -210,7 +219,8 @@ async function startDeviceAuth() {
         pollForToken(data.device_code, data.interval || 5);
     } catch (e) {
         console.error('Device auth failed:', e);
-        alert('Authentication failed. Please try again.');
+        // Fallback for static demo
+        alert('Authentication failed (Backend Offline). Use console to debug.');
         closeDeviceModal();
     }
 }
@@ -546,10 +556,13 @@ async function loadLeaderboard() {
                 topBody.innerHTML = data.top.map((e, i) => `
                     <tr class="forum-row alt-a">
                         <td><span class="rank-medal">${getRankMedal(i + 1)}</span></td>
-                        <td><a href="https://github.com/${e.github}" target="_blank">${esc(e.github)}</a></td>
+                        <td><a href="https://github.com/${e.github}" target="_blank">${esc(e.github)}</a>${e.verified ? '<span class="verified-badge" title="Verified Hardware">🛡️</span>' : ''}</td>
                         <td><span class="speed-value">${e.throughput}</span> Mbps</td>
                         <td>+${e.latency}ms</td>
-                        <td>${esc(e.hardware)}</td>
+                        <td>
+                            ${esc(e.hardware)}
+                            ${e.hwHash ? `<span class="hardware-hash" title="Reproducible Hash">#${e.hwHash.substring(0,8)}</span>` : ''}
+                        </td>
                         <td>${formatDate(e.date)}</td>
                     </tr>
                 `).join('');
@@ -558,11 +571,14 @@ async function loadLeaderboard() {
             if (data.recent?.length > 0) {
                 recentBody.innerHTML = data.recent.map(e => `
                     <tr class="forum-row alt-a">
-                        <td><a href="https://github.com/${e.github}" target="_blank">${esc(e.github)}</a></td>
+                        <td><a href="https://github.com/${e.github}" target="_blank">${esc(e.github)}</a>${e.verified ? '<span class="verified-badge" title="Verified Hardware">🛡️</span>' : ''}</td>
                         <td><span class="speed-value">${e.download}</span> Mbps</td>
                         <td><span class="speed-value">${e.upload}</span> Mbps</td>
                         <td>${e.latency} ms</td>
-                        <td>${esc(e.cork)}</td>
+                        <td>
+                            ${esc(e.cork || e.hardware)}
+                            ${e.hwHash ? `<span class="hardware-hash">#${e.hwHash.substring(0,8)}</span>` : ''}
+                        </td>
                         <td>${timeAgo(e.submitted)}</td>
                     </tr>
                 `).join('');
@@ -622,7 +638,55 @@ async function loadBlacklist() {
     }
 }
 
-// ===== RRUL SUBMISSION =====
+// ===== VERIFIED SUBMISSION FLOW =====
+async function initSubmitView() {
+    updateAuthUI();
+    if (state.user) {
+        // Generate new Challenge Token
+        try {
+            // In a real implementation, this hits the API
+            // const res = await fetch(CONFIG.api.getChallenge, { ... });
+            // const data = await res.json();
+            
+            // Simulating for UI
+            const challenge = 'rrul_' + Math.random().toString(36).substring(2, 6);
+            state.activeChallenge = challenge;
+            
+            document.getElementById('challenge-code').textContent = challenge;
+            document.getElementById('cmd-token').textContent = challenge;
+            
+            // Start Polling for Submission
+            pollForSubmission(challenge);
+            
+        } catch (e) {
+            console.error("Failed to generate challenge:", e);
+        }
+    }
+}
+
+function pollForSubmission(challenge) {
+    if (state.challengeInterval) clearInterval(state.challengeInterval);
+    
+    state.challengeInterval = setInterval(async () => {
+        try {
+            // const res = await fetch(`${CONFIG.api.checkChallenge}/${challenge}`);
+            // if (res.ok && (await res.json()).submitted) { ... }
+            
+            // Mocking success after random time for demo? 
+            // In real app, just wait for signal.
+        } catch (e) {
+            console.error("Poll failed");
+        }
+    }, 3000);
+}
+
+function copyChallenge() {
+    const code = document.getElementById('challenge-code').textContent;
+    navigator.clipboard.writeText(code);
+    alert('Challenge Token copied to clipboard!');
+}
+
+// ===== MANUAL SUBMISSION (LEGACY) =====
 async function submitRRUL() {
     if (!state.user) {
         startDeviceAuth();
@@ -653,7 +717,7 @@ async function submitRRUL() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${state.accessToken}`
             },
-            body: JSON.stringify({ rrul, cork, hardware, notes, github: state.user.login })
+            body: JSON.stringify({ rrul, cork, hardware, notes, github: state.user.login, verified: false })
         });
         
         if (res.ok) {
@@ -667,17 +731,7 @@ async function submitRRUL() {
         }
     } catch (e) {
         console.error('Submit failed:', e);
-        alert('Submission failed. Please try again.');
-    }
-}
-
-function previewRRUL() {
-    const jsonInput = document.getElementById('rrul-json').value;
-    try {
-        const rrul = JSON.parse(jsonInput);
-        alert(`Preview:\n\nDownload: ${rrul.download} Mbps\nUpload: ${rrul.upload} Mbps\nLatency: ${rrul.latency_idle || 'N/A'} ms`);
-    } catch (e) {
-        alert('Invalid JSON format');
+        alert('Submission failed (Backend Offline).');
     }
 }
 

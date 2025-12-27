@@ -704,6 +704,108 @@ a:hover, a:active { text-decoration: underline; color: #4ce070; }
 .reason-root { background: #220000; color: #cc6666; }
 .reason-abuse { background: #111; color: #777; }
 
+/* ===== CHALLENGE & VERIFIED STYLES ===== */
+.challenge-box {
+    background: #050505;
+    border: 1px solid #222;
+    padding: 20px;
+    text-align: center;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+
+.challenge-label {
+    font-size: 10px;
+    color: #555;
+    margin-bottom: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.challenge-code {
+    font-family: 'Courier New', monospace;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--highlight);
+    letter-spacing: 2px;
+    padding: 10px;
+    border: 1px dashed #333;
+    display: inline-block;
+    cursor: pointer;
+    margin-bottom: 15px;
+    transition: all 0.2s;
+}
+
+.challenge-code:hover {
+    background: #0a0a0a;
+    border-color: var(--highlight);
+}
+
+.challenge-cmd {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: #888;
+    background: #000;
+    padding: 8px;
+    border: 1px solid #111;
+    display: inline-block;
+    border-radius: 3px;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.form-instruction {
+    color: #ccc;
+    margin-bottom: 15px;
+    font-size: 11px;
+}
+
+.status-indicator {
+    margin-top: 15px;
+    font-size: 11px;
+    color: #666;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid #333;
+    border-top-color: var(--highlight);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.verified-badge {
+    display: inline-block;
+    margin-left: 4px;
+    color: var(--gold);
+    font-size: 12px;
+    cursor: help;
+}
+
+.hardware-hash {
+    font-family: 'Courier New', monospace;
+    color: #444;
+    font-size: 9px;
+    display: block;
+    margin-top: 2px;
+}
+
+.spec-sheet {
+    display: none; /* Hidden by default, shown on hover/click potentially */
+}
+
 /* ===== FORMS ===== */
 .form-body {
     background: var(--bg-table);
