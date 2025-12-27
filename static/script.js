@@ -1,9 +1,11 @@
 /* ============================================
    ci5.network Forums — Core Logic
    GitHub Discussions API + Device Flow Auth
+   Open Read / Verified Write Edition
    ============================================ */
 
 // ===== CONFIGURATION =====
+const CI5_API = 'https://api.ci5.network';
 const CONFIG = {
     // GitHub OAuth App Client ID (Shared Ecosystem ID)
     // Same ID used for ci5.dev and ci5 CLI
@@ -48,17 +50,134 @@ const state = {
     currentThread: null,
     currentRepo: 'all',
     deviceFlowInterval: null,
-    challengeInterval: null,
-    activeChallenge: null
+    sessionId: localStorage.getItem('ci5_session') || crypto.randomUUID(),
+    hwVerified: false,
+    hwid: null,
+    pendingAction: null
 };
+
+localStorage.setItem('ci5_session', state.sessionId);
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
+    injectModalHTML();
     initNavigation();
     initRepoTabs();
     checkAuth();
-    loadForumData();
+    checkHardwareVerification();
+    loadForumData(); // OPEN ACCESS: Load content immediately
 });
+
+// --- HARDWARE VERIFICATION LOGIC ---
+
+async function checkHardwareVerification() {
+    try {
+        const res = await fetch(`${CI5_API}/v1/identity/check?session=${state.sessionId}`);
+        const data = await res.json();
+        
+        if (data.verified) {
+            state.hwVerified = true;
+            state.hwid = data.hwid;
+            updateVerificationUI();
+        }
+    } catch (e) {
+        console.warn('Hardware check failed:', e);
+    }
+}
+
+async function requestHardwareVerification() {
+    // Generate challenge
+    const challenge = 'ci5_' + Math.random().toString(36).substring(2, 8);
+    
+    try {
+        await fetch(`${CI5_API}/v1/challenge/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                challenge,
+                session_id: state.sessionId,
+                expires: Date.now() + 300000 
+            }),
+        });
+        
+        showVerificationModal(challenge);
+        pollForVerification();
+    } catch (e) {
+        console.error("Failed to init verification", e);
+        alert("Verification API unavailable.");
+    }
+}
+
+function showVerificationModal(challenge) {
+    const modal = document.getElementById('hw-verify-modal');
+    document.getElementById('verify-command').textContent = `ci5 verify ${challenge}`;
+    modal.classList.remove('hidden');
+}
+
+function pollForVerification() {
+    const interval = setInterval(async () => {
+        const res = await fetch(`${CI5_API}/v1/identity/check?session=${state.sessionId}`);
+        const data = await res.json();
+        
+        if (data.verified) {
+            clearInterval(interval);
+            state.hwVerified = true;
+            state.hwid = data.hwid;
+            
+            document.getElementById('hw-verify-modal').classList.add('hidden');
+            updateVerificationUI();
+            
+            // Continue with original action
+            if (state.pendingAction) {
+                state.pendingAction();
+                state.pendingAction = null;
+            }
+        }
+    }, 2000);
+    setTimeout(() => clearInterval(interval), 300000);
+}
+
+function updateVerificationUI() {
+    const userBadge = document.getElementById('user-name');
+    if (state.hwVerified && userBadge) {
+        if (!userBadge.innerHTML.includes('[VERIFIED]')) {
+            userBadge.innerHTML += ` <span style="font-size:0.8em; color:#30d158;">[VERIFIED]</span>`;
+        }
+    }
+}
+
+function requireHardware(action) {
+    if (!state.user) {
+        startDeviceAuth();
+        return;
+    }
+    if (state.hwVerified) {
+        action();
+    } else {
+        state.pendingAction = action;
+        requestHardwareVerification();
+    }
+}
+
+function injectModalHTML() {
+    if (document.getElementById('hw-verify-modal')) return;
+    const div = document.createElement('div');
+    div.id = 'hw-verify-modal';
+    div.className = 'modal-overlay hidden';
+    div.innerHTML = `
+        <div class="modal-card" style="text-align:center">
+            <h2>🔒 Verified Hardware Required</h2>
+            <p>To post or submit results, you must verify your Ci5 appliance.</p>
+            <div style="background:#000; padding:15px; margin:20px 0; border-radius:8px; font-family:monospace; color:#30d158; font-size:1.2em;">
+                <span id="verify-command">Loading...</span>
+            </div>
+            <p style="color:#888; font-size:0.9em;">Run this command in your Ci5 terminal.</p>
+        </div>
+    `;
+    document.body.appendChild(div);
+}
+
+// --- STANDARD FORUM LOGIC ---
 
 function initNavigation() {
     document.querySelectorAll('.nav-link').forEach(link => {
@@ -95,12 +214,6 @@ function switchView(view) {
     updateBreadcrumb(view);
     state.currentView = view;
     
-    // Cleanup intervals
-    if (state.challengeInterval) {
-        clearInterval(state.challengeInterval);
-        state.challengeInterval = null;
-    }
-
     if (view === 'leaderboard') loadLeaderboard();
     if (view === 'blacklist') loadBlacklist();
     if (view === 'submit') initSubmitView();
@@ -182,6 +295,8 @@ function updateAuthUI() {
         if (submitAuth) submitAuth.classList.add('hidden');
         if (submitContent) submitContent.classList.remove('hidden');
         if (replyBox) replyBox.classList.remove('hidden');
+        
+        updateVerificationUI();
     } else {
         guest.classList.remove('hidden');
         user.classList.add('hidden');
@@ -641,133 +756,102 @@ async function loadBlacklist() {
 // ===== VERIFIED SUBMISSION FLOW =====
 async function initSubmitView() {
     updateAuthUI();
+    // This view is gated, so we can assume hardware is verified or in process
     if (state.user) {
-        // Generate new Challenge Token
-        try {
-            // In a real implementation, this hits the API
-            // const res = await fetch(CONFIG.api.getChallenge, { ... });
-            // const data = await res.json();
-            
-            // Simulating for UI
-            const challenge = 'rrul_' + Math.random().toString(36).substring(2, 6);
-            state.activeChallenge = challenge;
-            
-            document.getElementById('challenge-code').textContent = challenge;
-            document.getElementById('cmd-token').textContent = challenge;
-            
-            // Start Polling for Submission
-            pollForSubmission(challenge);
-            
-        } catch (e) {
-            console.error("Failed to generate challenge:", e);
-        }
+         // Auto-check on load if not already verified
+         if (!state.hwVerified) {
+             requireHardware(() => {}); // Trigger check if missing
+         }
     }
-}
-
-function pollForSubmission(challenge) {
-    if (state.challengeInterval) clearInterval(state.challengeInterval);
-    
-    state.challengeInterval = setInterval(async () => {
-        try {
-            // const res = await fetch(`${CONFIG.api.checkChallenge}/${challenge}`);
-            // if (res.ok && (await res.json()).submitted) { ... }
-            
-            // Mocking success after random time for demo? 
-            // In real app, just wait for signal.
-        } catch (e) {
-            console.error("Poll failed");
-        }
-    }, 3000);
-}
-
-function copyChallenge() {
-    const code = document.getElementById('challenge-code').textContent;
-    navigator.clipboard.writeText(code);
-    alert('Challenge Token copied to clipboard!');
 }
 
 // ===== MANUAL SUBMISSION (LEGACY) =====
 async function submitRRUL() {
-    if (!state.user) {
-        startDeviceAuth();
-        return;
-    }
-    
-    const jsonInput = document.getElementById('rrul-json').value;
-    const cork = document.getElementById('cork-select').value;
-    const hardware = document.getElementById('hardware-input').value;
-    const notes = document.getElementById('notes-input').value;
-    
-    let rrul;
-    try {
-        rrul = JSON.parse(jsonInput);
-        if (!rrul.download || !rrul.upload) throw new Error('Missing fields');
-    } catch (e) {
-        alert('Invalid RRUL JSON. Please paste valid flent output.');
-        return;
-    }
-    
-    if (!cork) { alert('Please select a Cork.'); return; }
-    if (!hardware) { alert('Please enter your hardware.'); return; }
-    
-    try {
-        const res = await fetch(CONFIG.api.submit, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${state.accessToken}`
-            },
-            body: JSON.stringify({ rrul, cork, hardware, notes, github: state.user.login, verified: false })
-        });
+    requireHardware(async () => {
+        const jsonInput = document.getElementById('rrul-json').value;
+        const cork = document.getElementById('cork-select').value;
+        const hardware = document.getElementById('hardware-input').value;
+        const notes = document.getElementById('notes-input').value;
         
-        if (res.ok) {
-            alert('RRUL results submitted successfully!');
-            document.getElementById('rrul-json').value = '';
-            document.getElementById('notes-input').value = '';
-            loadLeaderboard();
-        } else {
-            const err = await res.json();
-            alert(`Submission failed: ${err.message || 'Unknown error'}`);
+        let rrul;
+        try {
+            rrul = JSON.parse(jsonInput);
+            if (!rrul.download || !rrul.upload) throw new Error('Missing fields');
+        } catch (e) {
+            alert('Invalid RRUL JSON. Please paste valid flent output.');
+            return;
         }
-    } catch (e) {
-        console.error('Submit failed:', e);
-        alert('Submission failed (Backend Offline).');
-    }
+        
+        if (!cork) { alert('Please select a Cork.'); return; }
+        if (!hardware) { alert('Please enter your hardware.'); return; }
+        
+        try {
+            const res = await fetch(CONFIG.api.submit, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${state.accessToken}`
+                },
+                body: JSON.stringify({ 
+                    rrul, 
+                    cork, 
+                    hardware, 
+                    notes, 
+                    github: state.user.login, 
+                    hwid: state.hwid // Attach HWID
+                })
+            });
+            
+            if (res.ok) {
+                alert('RRUL results submitted successfully!');
+                document.getElementById('rrul-json').value = '';
+                document.getElementById('notes-input').value = '';
+                loadLeaderboard();
+                switchView('leaderboard');
+            } else {
+                const err = await res.json();
+                alert(`Submission failed: ${err.message || 'Unknown error'}`);
+            }
+        } catch (e) {
+            console.error('Submit failed:', e);
+            alert('Submission failed (Backend Offline).');
+        }
+    });
 }
 
 // ===== REPLY =====
 async function postReply() {
-    if (!state.user || !state.currentThread) return;
-    
-    const text = document.getElementById('reply-text').value.trim();
-    if (!text) { alert('Please enter a reply.'); return; }
-    
-    try {
-        const mutation = `mutation {
-            addDiscussionComment(input: {
-                discussionId: "${state.currentThread}",
-                body: "${text.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"
-            }) { comment { id } }
-        }`;
+    requireHardware(async () => {
+        const text = document.getElementById('reply-text').value.trim();
+        if (!text) { alert('Please enter a reply.'); return; }
         
-        const res = await fetch('https://api.github.com/graphql', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${state.accessToken}`
-            },
-            body: JSON.stringify({ query: mutation })
-        });
-        
-        const data = await res.json();
-        if (data.errors) throw new Error(data.errors[0].message);
-        
-        document.getElementById('reply-text').value = '';
-        viewThread(state.currentThread);
-    } catch (e) {
-        console.error('Reply failed:', e);
-        alert(`Failed to post reply: ${e.message}`);
-    }
+        try {
+            const mutation = `mutation {
+                addDiscussionComment(input: {
+                    discussionId: "${state.currentThread}",
+                    body: "${text.replace(/"/g, '\\"').replace(/\n/g, '\\n')}\\n\\n*Verified via Ci5 Hardware: ${state.hwid.substring(0,8)}...*"
+                }) { comment { id } }
+            }`;
+            
+            const res = await fetch('https://api.github.com/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${state.accessToken}`
+                },
+                body: JSON.stringify({ query: mutation })
+            });
+            
+            const data = await res.json();
+            if (data.errors) throw new Error(data.errors[0].message);
+            
+            document.getElementById('reply-text').value = '';
+            viewThread(state.currentThread);
+        } catch (e) {
+            console.error('Reply failed:', e);
+            alert(`Failed to post reply: ${e.message}`);
+        }
+    });
 }
 
 // ===== SEARCH =====
@@ -780,7 +864,7 @@ function doSearch() {
 // ===== UTILITIES =====
 function esc(text) {
     const div = document.createElement('div');
-    div.textContent = text;
+    div.textContent = text || '';
     return div.innerHTML;
 }
 
