@@ -9,6 +9,8 @@
  * - GitHub OAuth Device Flow
  * - Hardware challenge-response verification
  * - GitHub Discussions API integration
+ * 
+ * Session Duration: π hours (3.14159... hours ≈ 3h 8m 30s)
  */
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -17,8 +19,11 @@
 
 const CI5_API = 'https://api.ci5.network';
 
+// π hours in milliseconds
+const PI_HOURS_MS = Math.PI * 60 * 60 * 1000;
+
 const CONFIG = {
-    clientId: 'Ov23liSwq6nuhqFog2xr', 
+    clientId: 'Ov23liSwq6nuhqFog2xr',
     
     // GitHub repos for discussions
     repos: [
@@ -28,20 +33,13 @@ const CONFIG = {
         { owner: 'dreamswag', repo: 'ci5.dev', label: 'ci5.dev' }
     ],
     
-    // Category mappings
+    // Category mappings - map to GitHub Discussion categories
     categories: {
-        'metrics': { repo: 'ci5.network', ghCategory: 'METRICS', title: 'RRUL Submissions' },
-        'announcements': { repo: 'ci5.network', ghCategory: 'Announcements', title: 'Announcements' },
-        'intel_req': { repo: 'ci5.network', ghCategory: 'INTEL_REQ', title: 'INTEL_REQ' },
-        'armory': { repo: 'ci5.network', ghCategory: 'ARMORY', title: 'ARMORY' },
-        'cork-submissions': { repo: 'ci5.dev', ghCategory: 'General', title: 'Cork Submissions' }
-    },
-    
-    // API endpoints
-    api: {
-        leaderboard: '/api/leaderboard',
-        blacklist: '/api/blacklist',
-        submit: '/api/submit'
+        'metrics': { owner: 'dreamswag', repo: 'ci5.network', ghCategory: 'METRICS', title: 'RRUL Submissions' },
+        'announcements': { owner: 'dreamswag', repo: 'ci5.network', ghCategory: 'Announcements', title: 'Announcements' },
+        'intel_req': { owner: 'dreamswag', repo: 'ci5.network', ghCategory: 'INTEL_REQ', title: 'INTEL_REQ' },
+        'armory': { owner: 'dreamswag', repo: 'ci5.network', ghCategory: 'ARMORY', title: 'ARMORY' },
+        'cork-submissions': { owner: 'dreamswag', repo: 'ci5.dev', ghCategory: 'General', title: 'Cork Submissions' }
     }
 };
 
@@ -57,6 +55,7 @@ const state = {
     currentThread: null,
     currentRepo: 'all',
     deviceFlowInterval: null,
+    verificationPollInterval: null,
     
     // Hardware verification
     sessionId: localStorage.getItem('ci5_session') || crypto.randomUUID(),
@@ -73,16 +72,15 @@ localStorage.setItem('ci5_session', state.sessionId);
 // ═══════════════════════════════════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', () => {
-    injectModalHTML();
+    injectHardwareModal();
     initNavigation();
-    initRepoTabs();
     checkAuth();
     checkHardwareVerification();
-    loadForumData();
+    loadForumStats();
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HARDWARE VERIFICATION
+// HARDWARE VERIFICATION (π-hour sessions)
 // ═══════════════════════════════════════════════════════════════════════════
 
 async function checkHardwareVerification() {
@@ -93,7 +91,8 @@ async function checkHardwareVerification() {
         if (data.verified) {
             state.hwVerified = true;
             state.hwid = data.hwid;
-            updateVerificationUI();
+            updateHeaderUser();
+            console.log(`🔒 Hardware verified: ${state.hwid.substring(0, 8)}...`);
         }
     } catch (e) {
         console.warn('Hardware verification check failed:', e);
@@ -116,7 +115,7 @@ async function requestHardwareVerification() {
         
         if (!res.ok) throw new Error('Failed to create challenge');
         
-        showVerificationModal(challenge);
+        showHardwareModal(challenge);
         pollForVerification();
     } catch (e) {
         console.error('Verification init failed:', e);
@@ -124,9 +123,9 @@ async function requestHardwareVerification() {
     }
 }
 
-function showVerificationModal(challenge) {
+function showHardwareModal(challenge) {
     const modal = document.getElementById('hw-verify-modal');
-    const cmdSpan = document.getElementById('verify-command');
+    const cmdSpan = document.getElementById('hw-verify-command');
     
     if (modal && cmdSpan) {
         cmdSpan.textContent = `ci5 verify ${challenge}`;
@@ -134,25 +133,50 @@ function showVerificationModal(challenge) {
     }
 }
 
+function closeHardwareModal() {
+    const modal = document.getElementById('hw-verify-modal');
+    if (modal) modal.classList.add('hidden');
+    
+    if (state.verificationPollInterval) {
+        clearInterval(state.verificationPollInterval);
+        state.verificationPollInterval = null;
+    }
+    state.pendingAction = null;
+}
+
+function copyHardwareCommand() {
+    const cmd = document.getElementById('hw-verify-command');
+    if (cmd) {
+        navigator.clipboard.writeText(cmd.textContent);
+        cmd.style.color = '#fff';
+        setTimeout(() => cmd.style.color = '#30d158', 1000);
+    }
+}
+
 function pollForVerification() {
-    const interval = setInterval(async () => {
+    if (state.verificationPollInterval) {
+        clearInterval(state.verificationPollInterval);
+    }
+    
+    state.verificationPollInterval = setInterval(async () => {
         try {
             const res = await fetch(`${CI5_API}/v1/identity/check?session=${state.sessionId}`);
             const data = await res.json();
             
             if (data.verified) {
-                clearInterval(interval);
+                clearInterval(state.verificationPollInterval);
+                state.verificationPollInterval = null;
+                
                 state.hwVerified = true;
                 state.hwid = data.hwid;
                 
-                const modal = document.getElementById('hw-verify-modal');
-                if (modal) modal.classList.add('hidden');
-                
-                updateVerificationUI();
+                closeHardwareModal();
+                updateHeaderUser();
                 
                 if (state.pendingAction) {
-                    state.pendingAction();
+                    const action = state.pendingAction;
                     state.pendingAction = null;
+                    action();
                 }
             }
         } catch (e) {
@@ -160,20 +184,12 @@ function pollForVerification() {
         }
     }, 2000);
     
-    setTimeout(() => clearInterval(interval), 300000);
-}
-
-function updateVerificationUI() {
-    const userNameEl = document.getElementById('user-name');
-    if (userNameEl && state.hwVerified && !userNameEl.innerHTML.includes('[VERIFIED]')) {
-        userNameEl.innerHTML += ` <span style="font-size:0.8em; color:#30d158;">[🔒 VERIFIED]</span>`;
-    }
-    
-    // Enable reply box if on thread view
-    const replyBox = document.getElementById('reply-box');
-    if (replyBox && state.hwVerified) {
-        replyBox.classList.remove('hw-locked');
-    }
+    setTimeout(() => {
+        if (state.verificationPollInterval) {
+            clearInterval(state.verificationPollInterval);
+            state.verificationPollInterval = null;
+        }
+    }, 300000);
 }
 
 function requireHardware(action) {
@@ -191,52 +207,40 @@ function requireHardware(action) {
     requestHardwareVerification();
 }
 
-function injectModalHTML() {
+function injectHardwareModal() {
     if (document.getElementById('hw-verify-modal')) return;
     
     const div = document.createElement('div');
     div.id = 'hw-verify-modal';
     div.className = 'overlay hidden';
+    div.onclick = (e) => { if (e.target.id === 'hw-verify-modal') closeHardwareModal(); };
     div.innerHTML = `
-        <div class="vb-modal" style="text-align:center;">
+        <div class="vb-modal" style="text-align:center; max-width:420px;">
             <div class="cat-header">🔒 Hardware Verification Required</div>
             <div class="modal-body">
                 <p>To post or vote, you must verify your Ci5 hardware.</p>
-                <p style="color:#888; font-size:0.9em;">Run this command on your Pi:</p>
-                <div style="background:#000; padding:15px; margin:20px 0; border-radius:8px; font-family:monospace; color:#30d158; font-size:1.1em; cursor:pointer;" onclick="copyVerifyCommand()">
-                    <span id="verify-command">Loading...</span>
+                <p style="color:#666; font-size:0.9em;">Run this command on your Pi:</p>
+                <div class="code-display" style="cursor:pointer;" onclick="copyHardwareCommand()">
+                    <span id="hw-verify-command">ci5 verify ...</span>
                 </div>
-                <p style="color:#666; font-size:0.8em;">Click to copy • Waiting for verification...</p>
+                <p style="color:#555; font-size:0.8em;">Click to copy • Waiting for verification...</p>
+                <p style="color:#444; font-size:0.75em; margin-top:10px;">Session valid for π hours (~3h 8m) after verification</p>
             </div>
             <div class="modal-btns">
-                <button class="vb-btn" onclick="closeVerifyModal()">Cancel</button>
+                <button class="vb-btn" onclick="closeHardwareModal()">Cancel</button>
             </div>
         </div>
     `;
     document.body.appendChild(div);
 }
 
-function copyVerifyCommand() {
-    const cmd = document.getElementById('verify-command');
-    if (cmd) {
-        navigator.clipboard.writeText(cmd.textContent);
-        cmd.style.color = '#fff';
-        setTimeout(() => cmd.style.color = '#30d158', 1000);
-    }
-}
-
-function closeVerifyModal() {
-    const modal = document.getElementById('hw-verify-modal');
-    if (modal) modal.classList.add('hidden');
-    state.pendingAction = null;
-}
-
 // ═══════════════════════════════════════════════════════════════════════════
-// NAVIGATION & VIEW MANAGEMENT
+// NAVIGATION
 // ═══════════════════════════════════════════════════════════════════════════
 
 function initNavigation() {
-    document.querySelectorAll('.nav-link').forEach(link => {
+    // Desktop nav links
+    document.querySelectorAll('.nav-link[data-view]').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const view = link.dataset.view;
@@ -254,7 +258,7 @@ function initNavigation() {
             mobileMenuBtn.classList.toggle('active');
         });
         
-        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+        document.querySelectorAll('.mobile-nav-link[data-view]').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 mobileDrawer.classList.add('hidden');
@@ -263,19 +267,15 @@ function initNavigation() {
                 if (view) switchView(view);
             });
         });
-    }
-}
-
-function initRepoTabs() {
-    document.querySelectorAll('.repo-tab').forEach(tab => {
-        tab.addEventListener('click', (e) => {
-            e.preventDefault();
-            const repo = tab.dataset.repo;
-            filterByRepo(repo);
-            document.querySelectorAll('.repo-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
+        
+        // Close on outside click
+        document.addEventListener('click', (e) => {
+            if (!mobileDrawer.contains(e.target) && !mobileMenuBtn.contains(e.target) && !mobileDrawer.classList.contains('hidden')) {
+                mobileDrawer.classList.add('hidden');
+                mobileMenuBtn.classList.remove('active');
+            }
         });
-    });
+    }
 }
 
 function switchView(view) {
@@ -284,37 +284,32 @@ function switchView(view) {
     const panel = document.getElementById(`view-${view}`);
     if (panel) panel.classList.remove('hidden');
     
+    // Update nav active states
     document.querySelectorAll('.nav-link').forEach(l => {
+        l.classList.toggle('active', l.dataset.view === view);
+    });
+    document.querySelectorAll('.mobile-nav-link').forEach(l => {
         l.classList.toggle('active', l.dataset.view === view);
     });
     
     state.currentView = view;
     
+    // Load view-specific data
     if (view === 'leaderboard') loadLeaderboard();
     if (view === 'blacklist') loadBlacklist();
     if (view === 'submit') initSubmitView();
 }
 
-function filterByRepo(repo) {
-    state.currentRepo = repo;
-    document.querySelectorAll('.forum-table[data-repos]').forEach(table => {
-        const repos = table.dataset.repos.split(',');
-        if (repo === 'all' || repos.includes(repo)) {
-            table.classList.remove('hidden-by-filter');
-        } else {
-            table.classList.add('hidden-by-filter');
-        }
-    });
-}
-
 function toggleCategory(btn) {
     const body = btn.closest('.cat-header').nextElementSibling;
-    if (body.classList.contains('collapsed')) {
-        body.classList.remove('collapsed');
-        btn.textContent = '[−]';
-    } else {
-        body.classList.add('collapsed');
-        btn.textContent = '[+]';
+    if (body) {
+        if (body.classList.contains('collapsed')) {
+            body.classList.remove('collapsed');
+            btn.textContent = '[−]';
+        } else {
+            body.classList.add('collapsed');
+            btn.textContent = '[+]';
+        }
     }
 }
 
@@ -326,7 +321,7 @@ function checkAuth() {
     if (state.accessToken) {
         fetchUserInfo();
     }
-    updateAuthUI();
+    updateHeaderUser();
 }
 
 async function fetchUserInfo() {
@@ -337,36 +332,93 @@ async function fetchUserInfo() {
         
         if (res.ok) {
             state.user = await res.json();
-            updateAuthUI();
+            updateHeaderUser();
         } else {
-            logout();
+            logout(true);
         }
     } catch (e) {
         console.error('Auth check failed:', e);
     }
 }
 
-function updateAuthUI() {
-    const guest = document.getElementById('welcome-guest');
-    const user = document.getElementById('welcome-user');
+function updateHeaderUser() {
+    const headerUser = document.getElementById('header-user');
+    const mobileUserSection = document.getElementById('mobile-user-section');
     const replyBox = document.getElementById('reply-box');
+    const submitGate = document.getElementById('submit-auth-gate');
+    const submitForm = document.getElementById('submit-form-content');
     
     if (state.user) {
-        if (guest) guest.classList.add('hidden');
-        if (user) user.classList.remove('hidden');
+        // Desktop header
+        if (headerUser) {
+            const verifiedBadge = state.hwVerified 
+                ? '<span class="hw-badge">🔒</span>' 
+                : '';
+            headerUser.innerHTML = `
+                <img src="${state.user.avatar_url}" class="header-avatar" alt="">
+                <span class="header-username">${state.user.login}</span>
+                ${verifiedBadge}
+                <a href="#" class="header-logout" onclick="logout(); return false;">Log Out</a>
+            `;
+        }
         
-        const avatar = document.getElementById('user-avatar');
-        const userName = document.getElementById('user-name');
+        // Mobile section
+        if (mobileUserSection) {
+            mobileUserSection.innerHTML = `
+                <div class="mobile-nav-header">Account</div>
+                <div class="mobile-user-info">
+                    <img src="${state.user.avatar_url}" class="mobile-avatar" alt="">
+                    <span>${state.user.login}</span>
+                    ${state.hwVerified ? '<span class="hw-badge-small">🔒</span>' : ''}
+                </div>
+                <a href="#" class="mobile-nav-link" onclick="logout(); return false;">Log Out</a>
+            `;
+        }
         
-        if (avatar) avatar.src = state.user.avatar_url;
-        if (userName) userName.textContent = state.user.login;
+        // Show reply box in thread view
         if (replyBox) replyBox.classList.remove('hidden');
         
-        updateVerificationUI();
+        // Update submit view
+        if (submitGate) submitGate.classList.add('hidden');
+        if (submitForm) submitForm.classList.remove('hidden');
+        
+        // Update reply status
+        updateReplyStatus();
     } else {
-        if (guest) guest.classList.remove('hidden');
-        if (user) user.classList.add('hidden');
+        // Desktop header - login button
+        if (headerUser) {
+            headerUser.innerHTML = `
+                <button class="header-login-btn" onclick="startDeviceAuth()">Login</button>
+            `;
+        }
+        
+        // Mobile section
+        if (mobileUserSection) {
+            mobileUserSection.innerHTML = `
+                <div class="mobile-nav-header">Account</div>
+                <a href="#" class="mobile-nav-link" onclick="startDeviceAuth(); return false;">Login via GitHub</a>
+            `;
+        }
+        
+        // Hide reply box
         if (replyBox) replyBox.classList.add('hidden');
+        
+        // Update submit view
+        if (submitGate) submitGate.classList.remove('hidden');
+        if (submitForm) submitForm.classList.add('hidden');
+    }
+}
+
+function updateReplyStatus() {
+    const status = document.getElementById('reply-status');
+    if (!status) return;
+    
+    if (!state.user) {
+        status.innerHTML = '<span class="status-warn">Login required</span>';
+    } else if (!state.hwVerified) {
+        status.innerHTML = '<span class="status-warn">Hardware verification required</span>';
+    } else {
+        status.innerHTML = `<span class="status-ok">🔒 ${state.hwid?.substring(0, 8)}...</span>`;
     }
 }
 
@@ -380,11 +432,14 @@ async function startDeviceAuth() {
     if (codeSection) codeSection.classList.add('hidden');
     
     try {
-        // Use CORS proxy for static site
+        // Request device code - need write:discussion scope for posting
         const res = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://github.com/login/device/code'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({ client_id: CONFIG.clientId, scope: 'public_repo' })
+            body: JSON.stringify({ 
+                client_id: CONFIG.clientId, 
+                scope: 'public_repo write:discussion'  // Need this for posting
+            })
         });
         
         const data = await res.json();
@@ -426,6 +481,7 @@ function pollForToken(deviceCode, interval) {
             
             if (data.access_token) {
                 clearInterval(state.deviceFlowInterval);
+                state.deviceFlowInterval = null;
                 state.accessToken = data.access_token;
                 localStorage.setItem('gh_token', data.access_token);
                 closeDeviceModal();
@@ -449,7 +505,9 @@ function closeDeviceModal() {
     }
 }
 
-function logout() {
+function logout(silent = false) {
+    if (!silent && !confirm('Log out of ci5.network?')) return;
+    
     state.user = null;
     state.accessToken = null;
     state.hwVerified = false;
@@ -461,163 +519,190 @@ function logout() {
     state.sessionId = crypto.randomUUID();
     localStorage.setItem('ci5_session', state.sessionId);
     
-    updateAuthUI();
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// FORUM DATA LOADING
-// ═══════════════════════════════════════════════════════════════════════════
-
-async function loadForumData() {
-    loadActivityFeed();
-    loadCategoryStats();
-}
-
-async function loadActivityFeed() {
-    const list = document.getElementById('activity-list');
-    if (!list) return;
-    
-    try {
-        const activities = [];
-        
-        for (const repo of CONFIG.repos) {
-            try {
-                const discussions = await fetchRecentDiscussions(repo.owner, repo.repo, 3);
-                activities.push(...discussions.map(d => ({ ...d, repoLabel: repo.label })));
-            } catch (e) {
-                console.warn(`Failed to load ${repo.label}:`, e);
-            }
-        }
-        
-        activities.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        
-        if (activities.length === 0) {
-            list.innerHTML = '<div class="loading-row">No recent activity</div>';
-        } else {
-            list.innerHTML = activities.slice(0, 10).map(a => `
-                <div class="activity-item">
-                    <span class="activity-icon">💬</span>
-                    <div class="activity-content">
-                        <a href="#" class="activity-title" onclick="viewThread('${a.id}'); return false;">${esc(a.title)}</a>
-                        <div class="activity-meta">
-                            by ${esc(a.author?.login || 'unknown')} in ${a.repoLabel} · ${timeAgo(a.createdAt)}
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-    } catch (e) {
-        console.error('Activity load failed:', e);
-        list.innerHTML = '<div class="loading-row">Failed to load activity</div>';
+    updateHeaderUser();
+    if (state.currentView === 'submit') {
+        switchView('index');
     }
 }
 
-async function fetchRecentDiscussions(owner, repo, limit = 10) {
-    const query = `query {
-        repository(owner: "${owner}", name: "${repo}") {
-            discussions(first: ${limit}, orderBy: {field: CREATED_AT, direction: DESC}) {
-                nodes { id title createdAt author { login avatarUrl } category { name } comments { totalCount } }
-            }
-        }
-    }`;
-    
-    const res = await fetch('https://api.github.com/graphql', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            ...(state.accessToken ? { 'Authorization': `Bearer ${state.accessToken}` } : {})
-        },
-        body: JSON.stringify({ query })
-    });
-    
-    const data = await res.json();
-    return data.data?.repository?.discussions?.nodes || [];
-}
+// ═══════════════════════════════════════════════════════════════════════════
+// FORUM DATA
+// ═══════════════════════════════════════════════════════════════════════════
 
-async function loadCategoryStats() {
-    for (const [id, cfg] of Object.entries(CONFIG.categories)) {
+async function loadForumStats() {
+    // Load stats for each category
+    for (const [catId, cfg] of Object.entries(CONFIG.categories)) {
         try {
-            const repo = CONFIG.repos.find(r => r.label === cfg.repo);
-            if (!repo) continue;
+            const query = `query {
+                repository(owner: "${cfg.owner}", name: "${cfg.repo}") {
+                    discussions(first: 1, categoryId: null) {
+                        totalCount
+                    }
+                }
+            }`;
             
-            const threads = document.getElementById(`${id}-threads`);
-            const posts = document.getElementById(`${id}-posts`);
+            // Just set placeholders for now - full implementation would query by category
+            const threadsEl = document.getElementById(`${catId}-threads`);
+            const postsEl = document.getElementById(`${catId}-posts`);
+            const lastEl = document.getElementById(`${catId}-last`);
             
-            // Set placeholder values
-            if (threads) threads.textContent = '—';
-            if (posts) posts.textContent = '—';
+            if (threadsEl) threadsEl.textContent = '—';
+            if (postsEl) postsEl.textContent = '—';
+            if (lastEl) lastEl.textContent = 'Loading...';
         } catch (e) {
-            console.warn(`Stats failed for ${id}:`, e);
+            console.warn(`Failed to load stats for ${catId}:`, e);
         }
     }
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// THREAD VIEWING & POSTING
-// ═══════════════════════════════════════════════════════════════════════════
 
 async function viewCategory(categoryId) {
     const cfg = CONFIG.categories[categoryId];
     if (!cfg) return;
     
     state.currentCategory = { id: categoryId, ...cfg };
+    
+    const titleEl = document.getElementById('category-title');
+    const headerEl = document.getElementById('category-header');
+    const listEl = document.getElementById('thread-list');
+    
+    if (titleEl) titleEl.textContent = cfg.title;
+    if (headerEl) headerEl.textContent = `${cfg.title} Threads`;
+    if (listEl) listEl.innerHTML = '<tr><td colspan="4" class="loading-row">Loading threads...</td></tr>';
+    
     switchView('category');
+    
+    try {
+        const discussions = await fetchDiscussions(cfg.owner, cfg.repo, 20);
+        
+        if (discussions.length === 0) {
+            listEl.innerHTML = '<tr><td colspan="4" class="loading-row">No threads yet. Be the first!</td></tr>';
+        } else {
+            listEl.innerHTML = discussions.map(d => `
+                <tr class="forum-row">
+                    <td align="center"><div class="f-icon">💬</div></td>
+                    <td>
+                        <div class="thread-title">
+                            <a href="#" onclick="viewThread('${d.id}'); return false;">${esc(d.title)}</a>
+                        </div>
+                        <div class="thread-meta">
+                            by ${esc(d.author?.login || 'unknown')} · ${timeAgo(d.createdAt)}
+                        </div>
+                    </td>
+                    <td class="hide-mobile last-post">${d.comments?.totalCount > 0 ? timeAgo(d.updatedAt) : '—'}</td>
+                    <td align="center">${d.comments?.totalCount || 0}</td>
+                </tr>
+            `).join('');
+        }
+    } catch (e) {
+        console.error('Failed to load category:', e);
+        listEl.innerHTML = '<tr><td colspan="4" class="loading-row">Failed to load threads</td></tr>';
+    }
+}
+
+async function fetchDiscussions(owner, repo, limit = 10) {
+    const query = `query {
+        repository(owner: "${owner}", name: "${repo}") {
+            discussions(first: ${limit}, orderBy: {field: UPDATED_AT, direction: DESC}) {
+                nodes {
+                    id
+                    title
+                    createdAt
+                    updatedAt
+                    author { login avatarUrl }
+                    comments { totalCount }
+                }
+            }
+        }
+    }`;
+    
+    const headers = { 'Content-Type': 'application/json' };
+    if (state.accessToken) {
+        headers['Authorization'] = `Bearer ${state.accessToken}`;
+    }
+    
+    const res = await fetch('https://api.github.com/graphql', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ query })
+    });
+    
+    const data = await res.json();
+    
+    if (data.errors) {
+        console.error('GraphQL errors:', data.errors);
+        throw new Error(data.errors[0].message);
+    }
+    
+    return data.data?.repository?.discussions?.nodes || [];
 }
 
 async function viewThread(discussionId) {
     state.currentThread = discussionId;
-    switchView('thread');
     
+    const titleBar = document.getElementById('thread-title-bar');
     const postList = document.getElementById('post-list');
-    if (!postList) return;
     
-    postList.innerHTML = '<div class="loading-row">Loading thread...</div>';
+    if (titleBar) titleBar.textContent = 'Loading...';
+    if (postList) postList.innerHTML = '<div class="loading-row">Loading thread...</div>';
+    
+    switchView('thread');
+    updateReplyStatus();
     
     try {
-        const discussion = await fetchDiscussion(discussionId);
+        const query = `query {
+            node(id: "${discussionId}") {
+                ... on Discussion {
+                    id
+                    title
+                    body
+                    createdAt
+                    author { login avatarUrl }
+                    comments(first: 100) {
+                        nodes {
+                            id
+                            body
+                            createdAt
+                            author { login avatarUrl }
+                        }
+                    }
+                }
+            }
+        }`;
         
-        if (!discussion) {
-            postList.innerHTML = '<div class="loading-row">Thread not found</div>';
-            return;
+        const headers = { 'Content-Type': 'application/json' };
+        if (state.accessToken) {
+            headers['Authorization'] = `Bearer ${state.accessToken}`;
         }
         
-        const titleBar = document.getElementById('thread-title-bar');
+        const res = await fetch('https://api.github.com/graphql', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ query })
+        });
+        
+        const data = await res.json();
+        const discussion = data.data?.node;
+        
+        if (!discussion) {
+            throw new Error('Thread not found');
+        }
+        
         if (titleBar) titleBar.textContent = discussion.title;
         
+        // Render OP
         let html = renderPost(discussion, true);
+        
+        // Render replies
         if (discussion.comments?.nodes) {
             html += discussion.comments.nodes.map(c => renderPost(c, false)).join('');
         }
         
         postList.innerHTML = html;
-        updateAuthUI();
+        
     } catch (e) {
-        console.error('Thread load failed:', e);
+        console.error('Failed to load thread:', e);
         postList.innerHTML = '<div class="loading-row">Failed to load thread</div>';
     }
-}
-
-async function fetchDiscussion(discussionId) {
-    const query = `query {
-        node(id: "${discussionId}") {
-            ... on Discussion {
-                id title body createdAt author { login avatarUrl }
-                comments(first: 100) { nodes { id body createdAt author { login avatarUrl } } }
-            }
-        }
-    }`;
-    
-    const res = await fetch('https://api.github.com/graphql', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            ...(state.accessToken ? { 'Authorization': `Bearer ${state.accessToken}` } : {})
-        },
-        body: JSON.stringify({ query })
-    });
-    
-    const data = await res.json();
-    return data.data?.node;
 }
 
 function renderPost(post, isOP) {
@@ -625,14 +710,14 @@ function renderPost(post, isOP) {
     const username = post.author?.login || 'unknown';
     
     return `
-        <div class="post-container">
+        <div class="post-container ${isOP ? 'op' : ''}">
             <div class="post-header">
                 <span>${timeAgo(post.createdAt)}</span>
-                <span>#${isOP ? '1' : ''}</span>
+                <span>${isOP ? '#1' : ''}</span>
             </div>
             <div class="post-body">
                 <div class="post-meta">
-                    <img src="${avatar}" class="post-avatar">
+                    <img src="${avatar}" class="post-avatar" alt="">
                     <div class="post-username">${esc(username)}</div>
                     <div class="post-usertitle">${isOP ? 'Thread Starter' : 'Member'}</div>
                 </div>
@@ -642,12 +727,22 @@ function renderPost(post, isOP) {
     `;
 }
 
+function backToCategory() {
+    if (state.currentCategory) {
+        viewCategory(state.currentCategory.id);
+    } else {
+        switchView('index');
+    }
+}
+
 /**
  * Post reply — REQUIRES HARDWARE VERIFICATION
  */
 async function postReply() {
     requireHardware(async () => {
-        const text = document.getElementById('reply-text')?.value?.trim();
+        const textarea = document.getElementById('reply-text');
+        const text = textarea?.value?.trim();
+        
         if (!text) {
             alert('Please enter a reply.');
             return;
@@ -658,17 +753,26 @@ async function postReply() {
             return;
         }
         
+        // Show posting state
+        const btn = document.querySelector('#reply-box .vb-btn.primary');
+        const originalText = btn?.textContent;
+        if (btn) {
+            btn.textContent = 'Posting...';
+            btn.disabled = true;
+        }
+        
         try {
             // Append hardware verification signature
             const signature = state.hwVerified 
-                ? `\n\n---\n*Posted via Ci5 Verified Hardware: ${state.hwid?.substring(0, 8)}...*`
+                ? `\n\n---\n*Posted via Ci5 Verified Hardware: \`${state.hwid?.substring(0, 8)}...\`*`
                 : '';
             
-            const mutation = `mutation {
-                addDiscussionComment(input: {
-                    discussionId: "${state.currentThread}",
-                    body: "${(text + signature).replace(/"/g, '\\"').replace(/\n/g, '\\n')}"
-                }) { comment { id } }
+            const bodyText = text + signature;
+            
+            const mutation = `mutation AddComment($discussionId: ID!, $body: String!) {
+                addDiscussionComment(input: {discussionId: $discussionId, body: $body}) {
+                    comment { id }
+                }
             }`;
             
             const res = await fetch('https://api.github.com/graphql', {
@@ -677,17 +781,33 @@ async function postReply() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${state.accessToken}`
                 },
-                body: JSON.stringify({ query: mutation })
+                body: JSON.stringify({
+                    query: mutation,
+                    variables: {
+                        discussionId: state.currentThread,
+                        body: bodyText
+                    }
+                })
             });
             
             const data = await res.json();
-            if (data.errors) throw new Error(data.errors[0].message);
             
-            document.getElementById('reply-text').value = '';
+            if (data.errors) {
+                throw new Error(data.errors[0].message);
+            }
+            
+            // Success - clear and reload
+            textarea.value = '';
             viewThread(state.currentThread);
+            
         } catch (e) {
             console.error('Reply failed:', e);
-            alert(`Failed to post reply: ${e.message}`);
+            alert(`Failed to post reply: ${e.message}\n\nMake sure you have authorized the app with discussion permissions.`);
+        } finally {
+            if (btn) {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
         }
     });
 }
@@ -698,14 +818,9 @@ async function postReply() {
 
 async function loadLeaderboard() {
     const topBody = document.getElementById('lb-top-body');
-    const recentBody = document.getElementById('lb-recent-body');
     
-    // Placeholder data - replace with actual API call
     if (topBody) {
         topBody.innerHTML = '<tr><td colspan="6" class="loading-row">Leaderboard coming soon...</td></tr>';
-    }
-    if (recentBody) {
-        recentBody.innerHTML = '<tr><td colspan="6" class="loading-row">Recent submissions coming soon...</td></tr>';
     }
 }
 
@@ -724,9 +839,9 @@ async function loadBlacklist() {
                     hwidBody.innerHTML = data.hwids.map(h => `
                         <tr>
                             <td><code>${esc(h.partial)}</code></td>
-                            <td><span class="reason-badge reason-${h.reasonType}">${h.reasonType.toUpperCase()}</span> ${esc(h.reason)}</td>
-                            <td>${formatDate(h.bannedSince)}</td>
-                            <td class="${h.appeal === 'Denied' ? 'severity-critical' : ''}">${h.appeal}</td>
+                            <td><span class="reason-badge reason-${h.reasonType}">${(h.reasonType || 'abuse').toUpperCase()}</span> ${esc(h.reason)}</td>
+                            <td class="hide-mobile">${formatDate(h.bannedSince)}</td>
+                            <td class="hide-mobile ${h.appeal === 'Denied' ? 'severity-critical' : ''}">${h.appeal || 'Pending'}</td>
                         </tr>
                     `).join('');
                 } else {
@@ -739,10 +854,10 @@ async function loadBlacklist() {
                     corksBody.innerHTML = data.corks.map(c => `
                         <tr>
                             <td>${esc(c.id)}</td>
-                            <td><span class="reason-badge">${c.reasonType?.toUpperCase() || 'MALWARE'}</span></td>
-                            <td>${c.cve || 'N/A'}</td>
+                            <td><span class="reason-badge">${(c.reasonType || 'MALWARE').toUpperCase()}</span></td>
+                            <td class="hide-mobile">${c.cve || 'N/A'}</td>
                             <td>${c.severity || 'HIGH'}</td>
-                            <td>${formatDate(c.blockedSince)}</td>
+                            <td class="hide-mobile">${formatDate(c.blockedSince)}</td>
                         </tr>
                     `).join('');
                 } else {
@@ -758,12 +873,7 @@ async function loadBlacklist() {
 }
 
 function initSubmitView() {
-    updateAuthUI();
-    
-    if (state.user && !state.hwVerified) {
-        // Prompt for hardware verification
-        requireHardware(() => {});
-    }
+    updateHeaderUser();
 }
 
 /**
@@ -788,7 +898,6 @@ async function submitRRUL() {
         if (!cork) { alert('Please select a Cork.'); return; }
         if (!hardware) { alert('Please enter your hardware.'); return; }
         
-        // In real implementation, POST to your API
         console.log('RRUL Submission:', {
             rrul,
             cork,
@@ -817,7 +926,7 @@ function esc(text) {
 }
 
 function renderMarkdown(text) {
-    return text
+    return (text || '')
         .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre>$2</pre>')
         .replace(/`([^`]+)`/g, '<code>$1</code>')
         .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
@@ -831,15 +940,17 @@ function renderMarkdown(text) {
 }
 
 function timeAgo(dateString) {
+    if (!dateString) return '—';
     const seconds = Math.floor((new Date() - new Date(dateString)) / 1000);
     if (seconds < 60) return 'just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)} min ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
     return formatDate(dateString);
 }
 
 function formatDate(dateString) {
+    if (!dateString) return '—';
     return new Date(dateString).toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
@@ -861,6 +972,6 @@ document.addEventListener('keydown', (e) => {
     }
     if (e.key === 'Escape') {
         closeDeviceModal();
-        closeVerifyModal();
+        closeHardwareModal();
     }
 });

@@ -10,32 +10,41 @@
 <body>
 
     <div class="vb-header">
-        <div class="header-left">
-            <a href="https://github.com/dreamswag/ci5" target="_blank" class="logo-group">
-                <img src="https://ci5.run/static/signal.png" class="vb-logo" alt="Ci5">
-                <div class="logo-text">
-                    <div class="brand">ci5<span class="brand-tld">.network</span></div>
+        <div class="vb-header-inner">
+            <div class="header-left">
+                <a href="#" onclick="switchView('index'); return false;" class="logo-group">
+                    <span class="logo-emoji">🃏</span>
+                    <span class="brand">ci5<span class="brand-tld">.network</span></span>
+                </a>
+                
+                <div class="header-links">
+                    <a href="https://ci5.run" class="header-link">run</a>
+                    <a href="https://ci5.host" class="header-link">host</a>
+                    <a href="https://ci5.dev" class="header-link">dev</a>
                 </div>
-            </a>
-            <div class="header-links">
-                <a href="https://ci5.run" class="header-link">run</a>
-                <a href="https://ci5.host" class="header-link">host</a>
-                <a href="https://ci5.dev" class="header-link">dev</a>
+                
+                <div class="header-divider"></div>
+                
+                <div class="header-user" id="header-user">
+                    </div>
+                
+                <div class="header-divider"></div>
+                
+                <div class="header-search-wrapper">
+                    <input type="text" class="header-search-input" placeholder="Search..." id="search-input">
+                    <button class="vb-btn header-search-btn" onclick="doSearch()">Go</button>
+                </div>
             </div>
+            
+            <div class="header-right">
+                </div>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
-        <div class="header-right">
-            <div class="nav-links">
-                <a href="#" class="nav-link active" data-view="index">Forums</a>
-                <a href="#" class="nav-link" data-view="leaderboard">Leaderboard</a>
-                <a href="#" class="nav-link" data-view="submit">Submit RRUL</a>
-                <a href="#" class="nav-link" data-view="blacklist">Blacklist</a>
-            </div>
-        </div>
-        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
     </div>
 
     <div class="mobile-nav-drawer hidden" id="mobileNavDrawer">
@@ -45,78 +54,66 @@
                 <a href="#" class="mobile-nav-link active" data-view="index">Forums</a>
                 <a href="#" class="mobile-nav-link" data-view="leaderboard">Leaderboard</a>
                 <a href="#" class="mobile-nav-link" data-view="submit">Submit RRUL</a>
-                <a href="#" class="mobile-nav-link" data-view="blacklist">Blacklist</a>
+                <a href="#" class="mobile-nav-link" data-view="data">Community Stats</a>
+            </div>
+            <div class="mobile-nav-section" id="mobile-user-section">
+                </div>
+        </div>
+    </div>
+
+    <div class="overlay hidden" id="device-modal">
+        <div class="vb-modal">
+            <div class="cat-header">GitHub Device Authorization</div>
+            <div class="modal-body">
+                <div id="device-loading">
+                    <p>Requesting device code...</p>
+                </div>
+                <div id="device-code-section" class="hidden">
+                    <p>Enter this code at <a href="https://github.com/login/device" target="_blank" class="highlight">github.com/login/device</a></p>
+                    <div class="code-display" id="user-code">XXXX-XXXX</div>
+                    <p class="tiny">Waiting for authorization...</p>
+                </div>
+            </div>
+            <div class="modal-btns">
+                <button class="vb-btn" onclick="closeDeviceModal()">Cancel</button>
             </div>
         </div>
     </div>
 
     <div class="vb-body">
-        <div class="search-bar-mobile">
-            <input type="text" class="search-input" placeholder="Search..." id="search-input">
-            <button class="vb-btn" onclick="doSearch()">Go</button>
-        </div>
-
-        <div class="welcome-panel" id="welcome-panel">
-            <div class="welcome-guest" id="welcome-guest">
-                <div class="welcome-text">
-                    <strong>Welcome, Guest.</strong><br>
-                    <a href="#" onclick="startDeviceAuth(); return false;">Login via GitHub</a> to participate.
-                </div>
-                <div class="login-area">
-                    <button class="vb-btn primary" onclick="startDeviceAuth()">GitHub Login</button>
-                </div>
-            </div>
-            <div class="welcome-user hidden" id="welcome-user">
-                <img src="" alt="" class="user-avatar" id="user-avatar">
-                <div class="welcome-text">
-                    Welcome back, <strong id="user-name"></strong>.<br>
-                    <a href="#" onclick="logout(); return false;">Log Out</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="overlay hidden" id="device-modal">
-            <div class="vb-modal">
-                <div class="cat-header">GitHub Device Authorization</div>
-                <div class="modal-body">
-                    <div id="device-loading">
-                        <p>Requesting device code...</p>
-                    </div>
-                    <div id="device-code-section" class="hidden">
-                        <p>Enter this code at <a href="https://github.com/login/device" target="_blank" class="highlight">github.com/login/device</a></p>
-                        <div class="code-display" id="user-code">XXXX-XXXX</div>
-                        <p class="tiny">Waiting for authorization...</p>
-                    </div>
-                </div>
-                <div class="modal-btns">
-                    <button class="vb-btn" onclick="closeDeviceModal()">Cancel</button>
-                </div>
-            </div>
-        </div>
 
         <div id="main-content">
 
             <div class="view-panel" id="view-index">
 
-                <div class="forum-table" data-repos="ci5.network">
+                <div class="forum-table gold-table" data-repos="ci5.network">
                     <div class="cat-header gold">
                         <span class="collapse-btn" onclick="toggleCategory(this)">[−]</span>
-                        🏆 Performance Arena
+                        <span>🏆 Performance Arena</span>
+                        
+                        <div class="header-action-group">
+                            <a href="#" onclick="switchView('data'); return false;" class="cat-header-action">
+                                Community Stats
+                            </a>
+                            <a href="#" onclick="switchView('submit'); return false;" class="cat-header-action">
+                                Submit RRUL
+                            </a>
+                        </div>
                     </div>
                     <div class="cat-body">
                         <table width="100%" cellpadding="0" cellspacing="1">
                             <tr class="thead-row">
                                 <th width="5%"></th>
-                                <th>Forum</th>
-                                <th class="hide-mobile" width="10%">Threads</th>
-                                <th class="hide-mobile" width="10%">Posts</th>
-                                <th class="hide-mobile" width="25%">Last Post</th>
+                                <th class="align-left">Forum</th>
+                                <th class="align-center hide-mobile" width="10%">Threads</th>
+                                <th class="align-center hide-mobile" width="10%">Posts</th>
+                                <th class="align-left hide-mobile" width="25%">Last Post</th>
                             </tr>
                             <tr class="forum-row alt-a" data-category="metrics">
                                 <td align="center"><div class="f-icon new">📊</div></td>
                                 <td>
                                     <div class="forum-title"><a href="#" onclick="viewCategory('metrics'); return false;">RRUL Submissions</a></div>
-                                    <div class="forum-desc">Post your Realtime Response Under Load results. Auto-indexed to leaderboard.</div>
+                                    <div class="forum-desc">Post your Realtime Response Under Load results.<br>Auto-indexed to leaderboard.</div>
                                     <div class="forum-meta-mobile">
                                         <span id="metrics-threads-m">0</span> threads · <span id="metrics-posts-m">0</span> posts
                                     </div>
@@ -148,10 +145,10 @@
                         <table width="100%" cellpadding="0" cellspacing="1">
                             <tr class="thead-row">
                                 <th width="5%"></th>
-                                <th>Forum</th>
-                                <th class="hide-mobile" width="10%">Threads</th>
-                                <th class="hide-mobile" width="10%">Posts</th>
-                                <th class="hide-mobile" width="25%">Last Post</th>
+                                <th class="align-left">Forum</th>
+                                <th class="align-center hide-mobile" width="10%">Threads</th>
+                                <th class="align-center hide-mobile" width="10%">Posts</th>
+                                <th class="align-left hide-mobile" width="25%">Last Post</th>
                             </tr>
                             <tr class="forum-row alt-a" data-category="announcements">
                                 <td align="center"><div class="f-icon">📢</div></td>
@@ -170,7 +167,7 @@
                     </div>
                 </div>
 
-                <div class="forum-table" data-repos="ci5.network,ci5,ci5.host,ci5.dev">
+                <div class="forum-table" data-repos="ci5.network">
                     <div class="cat-header">
                         <span class="collapse-btn" onclick="toggleCategory(this)">[−]</span>
                         💬 Community Discussion
@@ -179,32 +176,26 @@
                         <table width="100%" cellpadding="0" cellspacing="1">
                             <tr class="thead-row">
                                 <th width="5%"></th>
-                                <th>Forum</th>
-                                <th class="hide-mobile" width="10%">Threads</th>
-                                <th class="hide-mobile" width="10%">Posts</th>
-                                <th class="hide-mobile" width="25%">Last Post</th>
+                                <th class="align-left">Forum</th>
+                                <th class="align-center hide-mobile" width="10%">Threads</th>
+                                <th class="align-center hide-mobile" width="10%">Posts</th>
+                                <th class="align-left hide-mobile" width="25%">Last Post</th>
                             </tr>
                             <tr class="forum-row alt-a" data-category="intel_req">
                                 <td align="center"><div class="f-icon">🚨</div></td>
                                 <td>
                                     <div class="forum-title"><a href="#" onclick="viewCategory('intel_req'); return false;">INTEL_REQ</a></div>
-                                    <div class="forum-desc">Unsolved queries, malfunctions, troubleshooting. Include bone_marrow.sh output.</div>
-                                    <div class="forum-meta-mobile">
-                                        <span id="intel_req-threads-m">0</span> threads · <span id="intel_req-posts-m">0</span> posts
-                                    </div>
+                                    <div class="forum-desc">Unsolved queries, malfunctions, troubleshooting.<br>Include bone_marrow.sh output.</div>
                                 </td>
                                 <td class="hide-mobile" align="center" id="intel_req-threads">—</td>
                                 <td class="hide-mobile" align="center" id="intel_req-posts">—</td>
                                 <td class="last-post hide-mobile" id="intel_req-last">Loading...</td>
                             </tr>
                             <tr class="forum-row alt-b" data-category="armory">
-                                <td align="center"><div class="f-icon">🛠️</div></td>
+                                <td align="center"><div class="f-icon">⚔️</div></td>
                                 <td>
                                     <div class="forum-title"><a href="#" onclick="viewCategory('armory'); return false;">ARMORY</a></div>
-                                    <div class="forum-desc">Hardware Showcase. Custom enclosures, cooling mods, HAT implementations.</div>
-                                    <div class="forum-meta-mobile">
-                                        <span id="armory-threads-m">0</span> threads · <span id="armory-posts-m">0</span> posts
-                                    </div>
+                                    <div class="forum-desc">Hardware Showcase.<br>Custom enclosures, cooling mods, HAT implementations.</div>
                                 </td>
                                 <td class="hide-mobile" align="center" id="armory-threads">—</td>
                                 <td class="hide-mobile" align="center" id="armory-posts">—</td>
@@ -217,25 +208,22 @@
                 <div class="forum-table" data-repos="ci5.dev">
                     <div class="cat-header">
                         <span class="collapse-btn" onclick="toggleCategory(this)">[−]</span>
-                        📦 Cork Development
+                        🍾 Cork Development
                     </div>
                     <div class="cat-body">
                         <table width="100%" cellpadding="0" cellspacing="1">
                             <tr class="thead-row">
                                 <th width="5%"></th>
-                                <th>Forum</th>
-                                <th class="hide-mobile" width="10%">Threads</th>
-                                <th class="hide-mobile" width="10%">Posts</th>
-                                <th class="hide-mobile" width="25%">Last Post</th>
+                                <th class="align-left">Forum</th>
+                                <th class="align-center hide-mobile" width="10%">Threads</th>
+                                <th class="align-center hide-mobile" width="10%">Posts</th>
+                                <th class="align-left hide-mobile" width="25%">Last Post</th>
                             </tr>
                             <tr class="forum-row alt-a" data-category="cork-submissions">
-                                <td align="center"><div class="f-icon new">🧪</div></td>
+                                <td align="center"><div class="f-icon">✏️</div></td>
                                 <td>
                                     <div class="forum-title"><a href="#" onclick="viewCategory('cork-submissions'); return false;">Cork Submissions</a></div>
-                                    <div class="forum-desc">Submit containers for Winery processing. Community review pipeline.</div>
-                                    <div class="forum-meta-mobile">
-                                        <span id="cork-submissions-threads-m">0</span> threads · <span id="cork-submissions-posts-m">0</span> posts
-                                    </div>
+                                    <div class="forum-desc">Submit containers for Winery processing.<br>Community review pipeline.</div>
                                 </td>
                                 <td class="hide-mobile" align="center" id="cork-submissions-threads">—</td>
                                 <td class="hide-mobile" align="center" id="cork-submissions-posts">—</td>
@@ -245,85 +233,61 @@
                     </div>
                 </div>
 
-                <div class="forum-table" data-repos="ci5.network">
+                <div class="forum-table shame-table" data-repos="ci5.network">
                     <div class="cat-header shame">
                         <span class="collapse-btn" onclick="toggleCategory(this)">[−]</span>
-                        🔔 HALL_OF.shAME
+                        ⚠️ HALL_OF.shAME
                     </div>
                     <div class="cat-body">
                         <table width="100%" cellpadding="0" cellspacing="1">
                             <tr class="thead-row">
                                 <th width="5%"></th>
-                                <th>Forum</th>
-                                <th class="hide-mobile" width="10%">Entries</th>
-                                <th class="hide-mobile" width="10%">Reports</th>
-                                <th class="hide-mobile" width="25%">Last Entry</th>
+                                <th class="align-left">Forum</th>
+                                <th class="align-center hide-mobile" width="10%">Entries</th>
+                                <th class="align-center hide-mobile" width="10%">Reports</th>
+                                <th class="align-left hide-mobile" width="25%">Last Entry</th>
                             </tr>
                             <tr class="forum-row alt-a">
-                                <td align="center"><div class="f-icon shame">🚫</div></td>
+                                <td align="center"><div class="f-icon shame">💀</div></td>
                                 <td>
                                     <div class="forum-title"><a href="#" onclick="switchView('blacklist'); return false;">Compromised Corks & Blacklisted HWIDs</a></div>
-                                    <div class="forum-desc">Flagged for CVEs, malware, abuse. Auto-blocked by ci5.run bootstrap.</div>
+                                    <div class="forum-desc">Flagged for CVEs, malware, abuse.<br>Auto-blocked by ci5.run bootstrap.</div>
                                 </td>
-                                <td class="hide-mobile" align="center" id="blacklist-entries">—</td>
-                                <td class="hide-mobile" align="center" id="blacklist-reports">—</td>
-                                <td class="last-post hide-mobile" id="blacklist-last">Loading...</td>
+                                <td class="hide-mobile" align="center">—</td>
+                                <td class="hide-mobile" align="center">—</td>
+                                <td class="last-post hide-mobile">Loading...</td>
                             </tr>
                         </table>
                     </div>
                 </div>
 
-                <div class="forum-table">
-                    <div class="cat-header">Latest Activity</div>
+                <div class="activity-panel">
+                    <div class="activity-header">Latest Activity</div>
                     <div class="activity-list" id="activity-list">
-                        <div class="loading-row">Loading from GitHub Discussions...</div>
+                        <div class="activity-empty">No recent activity</div>
                     </div>
                 </div>
 
             </div>
 
             <div class="view-panel hidden" id="view-leaderboard">
-                <div class="page-title">Performance Leaderboard</div>
-                <p class="page-desc">1.74Gbps Gauntlet. First verified submission claims eternal glory 🐹🪽 </p>
+                <div class="page-title">🏆 RRUL Leaderboard</div>
+                <p class="page-desc">Hardware-verified performance rankings. Only ci5-ASH verified entries appear here.</p>
 
                 <div class="forum-table">
-                    <div class="cat-header gold">"Holy Ci5 🤯" - Top Performers</div>
+                    <div class="cat-header gold">Top Performers (All Time)</div>
                     <div class="table-scroll">
                         <table class="data-table" width="100%">
                             <tr class="thead-row">
-                                <th>Rank</th>
-                                <th>Pilot</th>
-                                <th>Throughput</th>
-                                <th class="hide-mobile">Latency</th>
+                                <th width="5%">#</th>
+                                <th>User</th>
+                                <th>Download</th>
+                                <th>Upload</th>
                                 <th class="hide-mobile">Hardware</th>
-                                <th class="hide-mobile">Date</th>
+                                <th class="hide-mobile">HWID</th>
                             </tr>
                             <tbody id="lb-top-body">
-                                <tr class="bounty-row">
-                                    <td colspan="6">
-                                        <div class="bounty-text">⚡ 1.74Gbps BOUNTY UNCLAIMED ⚡</div>
-                                        <div class="bounty-sub">Be the first to break the barrier</div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="forum-table">
-                    <div class="cat-header">📊 Recent Verified Submissions</div>
-                    <div class="table-scroll">
-                        <table class="data-table" width="100%">
-                            <tr class="thead-row">
-                                <th>Pilot</th>
-                                <th>Download</th>
-                                <th class="hide-mobile">Upload</th>
-                                <th class="hide-mobile">Latency</th>
-                                <th class="hide-mobile">Hardware / Hash</th>
-                                <th>Submitted</th>
-                            </tr>
-                            <tbody id="lb-recent-body">
-                                <tr><td colspan="6" class="loading-row">Loading submissions...</td></tr>
+                                <tr><td colspan="6" class="loading-row">Leaderboard coming soon...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -335,71 +299,42 @@
             </div>
 
             <div class="view-panel hidden" id="view-submit">
-                <div class="page-title">Submit RRUL Results</div>
-                <p class="page-desc">Attested Execution via <code>ci5</code> CLI is required for Leaderboard verification.</p>
+                <div class="page-title">📊 Submit RRUL Results</div>
+                <p class="page-desc">Hardware verification required. Fake submissions result in permanent HWID ban.</p>
 
-                <div class="auth-required hidden" id="submit-auth-required">
-                    <div class="forum-table">
-                        <div class="cat-header">Authentication Required</div>
-                        <div class="auth-required">
-                            <p>You must be logged in to generate a challenge token.</p>
-                            <button class="vb-btn primary" onclick="startDeviceAuth()">Login via GitHub</button>
+                <div class="forum-table">
+                    <div class="cat-header">RRUL Submission Form</div>
+                    <div class="submit-form">
+                        <div class="auth-gate" id="submit-auth-gate">
+                            <p>You must be logged in and hardware-verified to submit.</p>
+                            <button class="vb-btn primary" onclick="startDeviceAuth()">Login with GitHub</button>
                         </div>
-                    </div>
-                </div>
-
-                <div id="submit-content" class="hidden">
-                    <div class="forum-table">
-                        <div class="cat-header gold">⚡ Verified Submission (Proof of Work)</div>
-                        <div class="form-body center-text">
-                            <p class="form-instruction">Run this command on your Ci5 device to attest hardware and performance:</p>
-                            
-                            <div class="challenge-box">
-                                <div class="challenge-label">CHALLENGE TOKEN (Expires in 5:00)</div>
-                                <div class="challenge-code" id="challenge-code" onclick="copyChallenge()">LOADING...</div>
-                                <div class="challenge-cmd">ci5 rrul --verify <span id="cmd-token">...</span></div>
+                        <div class="form-content hidden" id="submit-form-content">
+                            <div class="form-group">
+                                <label>Flent JSON Output:</label>
+                                <textarea id="rrul-json" rows="6" placeholder='{"download": 940.5, "upload": 892.1, ...}'></textarea>
                             </div>
-                            
-                            <div class="status-indicator" id="challenge-status">
-                                <span class="spinner"></span> Waiting for device connection...
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>Cork:</label>
+                                    <select id="cork-select">
+                                        <option value="">Select Cork...</option>
+                                        <option value="ci5-stock">ci5-stock (default)</option>
+                                        <option value="ci5-turbo">ci5-turbo</option>
+                                        <option value="custom">Custom/Modified</option>
+                                    </select>
+                                </div>
+                                <div class="form-group half">
+                                    <label>Hardware:</label>
+                                    <input type="text" id="hardware-input" placeholder="e.g., Pi5 8GB + RTL8153">
+                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="forum-table">
-                        <div class="cat-header">
-                            <span class="collapse-btn" onclick="toggleCategory(this)">[+]</span>
-                            📝 Manual Submission (Legacy / Unverified)
-                        </div>
-                        <div class="form-body collapsed">
-                            <div class="form-fields" id="submit-form-fields">
-                                <p class="tiny dim" style="margin-bottom:10px;">Note: Manual submissions are marked as "Unverified" and are ineligible for Gold Badges.</p>
-                                <div class="form-group">
-                                    <label>RRUL JSON Output:</label>
-                                    <textarea id="rrul-json" placeholder='Paste flent RRUL JSON output...'></textarea>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group half">
-                                        <label>Cork Used:</label>
-                                        <select id="cork-select">
-                                            <option value="">Select Cork...</option>
-                                            <option value="cake-autorate">cake-autorate</option>
-                                            <option value="sqm-scripts">sqm-scripts</option>
-                                            <option value="custom">Custom (specify in notes)</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group half">
-                                        <label>Hardware:</label>
-                                        <input type="text" id="hardware-input" placeholder="e.g., Pi5 8GB + RTL8153">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Notes (optional):</label>
-                                    <textarea id="notes-input" rows="3" placeholder="ISP, line speed, any custom tuning..."></textarea>
-                                </div>
-                                <div class="form-actions">
-                                    <button class="vb-btn" onclick="submitRRUL()">Submit Unverified</button>
-                                </div>
+                            <div class="form-group">
+                                <label>Notes (optional):</label>
+                                <textarea id="notes-input" rows="3" placeholder="ISP, line speed, any custom tuning..."></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button class="vb-btn primary" onclick="submitRRUL()">Submit (Hardware Verified)</button>
                             </div>
                         </div>
                     </div>
@@ -414,7 +349,7 @@
                 <div class="page-title shame">⛔ Hall of .shAME</div>
                 <p class="page-desc">Compromised Corks and blacklisted Hardware IDs. Auto-blocked by ci5.run.</p>
 
-                <div class="forum-table">
+                <div class="forum-table shame-table">
                     <div class="cat-header shame">Confirmed Compromised Corks</div>
                     <div class="table-scroll">
                         <table class="data-table" width="100%">
@@ -432,7 +367,7 @@
                     </div>
                 </div>
 
-                <div class="forum-table">
+                <div class="forum-table shame-table">
                     <div class="cat-header shame">Hardware-ID Blacklist</div>
                     <div class="table-scroll">
                         <table class="data-table" width="100%">
@@ -487,6 +422,7 @@
                     <div class="reply-form">
                         <textarea id="reply-text" placeholder="Write your reply..."></textarea>
                         <div class="reply-actions">
+                            <span class="reply-status" id="reply-status"></span>
                             <button class="vb-btn primary" onclick="postReply()">Post Reply</button>
                         </div>
                     </div>
@@ -504,45 +440,10 @@
             <a href="/docs/SUPPORT.md">Support</a> · 
             <a href="/docs/ARCHITECTURE.md">Docs</a>
             <br>
-            USB3.0 NIC License<br>
-            <span class="tiny">🎪    N0 R19H75 D353RV3D. 🎪</span>
+            <span class="tiny">🎪 N0 R19H75 D353RV3D. 🎪</span>
         </div>
     </div>
 
     <script src="static/script.js"></script>
-    <script>
-        // Mobile menu toggle
-        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
-            const drawer = document.getElementById('mobileNavDrawer');
-            const btn = this;
-            drawer.classList.toggle('hidden');
-            btn.classList.toggle('active');
-        });
-
-        // Mobile nav links
-        document.querySelectorAll('.mobile-nav-link[data-view]').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const view = this.dataset.view;
-                switchView(view);
-                document.getElementById('mobileNavDrawer').classList.add('hidden');
-                document.getElementById('mobileMenuBtn').classList.remove('active');
-                
-                // Update active state
-                document.querySelectorAll('.mobile-nav-link').forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        // Close drawer when clicking outside
-        document.addEventListener('click', function(e) {
-            const drawer = document.getElementById('mobileNavDrawer');
-            const btn = document.getElementById('mobileMenuBtn');
-            if (!drawer.contains(e.target) && !btn.contains(e.target) && !drawer.classList.contains('hidden')) {
-                drawer.classList.add('hidden');
-                btn.classList.remove('active');
-            }
-        });
-    </script>
 </body>
 </html>
